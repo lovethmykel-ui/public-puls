@@ -1,4 +1,4 @@
-import type { Official, Agency, Election, TrendingIssue, StateSentiment } from '../types';
+import type { Official, Agency, Election, TrendingIssue, StateSentiment, ForumPost } from '../types';
 
 export const NATIONAL_CONFIDENCE_INDEX = {
   score: 54.3,
@@ -15,8 +15,8 @@ export const PLATFORM_STATS = {
   officialsRated: '18.4K',
   electionsTracked: 36,
   totalVotesCast: '3.82M',
-  marketCapTrust: '₦12.48B',
-  volume24h: '₦380.6M',
+  totalCitizenAudits: '1.48M Audits',
+  volume24h: '380.6K Votes',
   sentimentBullish: 62,
   sentimentBearish: 38,
 };
@@ -31,10 +31,12 @@ export const OFFICIALS: Official[] = [
     category: 'executive',
     avatar: '/avatars/tinubu.jpg',
     state: 'Lagos State',
-    trustIndex: 61.45,
+    trustIndex: 61.5,
     change24h: +3.56,
     change7d: +3.95,
     ratingsCount: 18432,
+    upvotesCount: 9953,
+    downvotesCount: 8479,
     approval: { positive: 54, neutral: 25, negative: 21 },
     radar: {
       economy: 56.1,
@@ -44,7 +46,7 @@ export const OFFICIALS: Official[] = [
       infrastructure: 68.4,
       integrity: 49.0
     },
-    sparkline: [56.2, 57.0, 56.8, 58.4, 59.1, 60.3, 61.45],
+    sparkline: [56.2, 57.0, 56.8, 58.4, 59.1, 60.3, 61.5],
     bio: '16th President of Nigeria. Leading the Renewed Hope agenda focused on monetary reforms, macroeconomic stabilization, and infrastructure development.',
     assumedOffice: 'May 29, 2023',
     keyInitiatives: [
@@ -85,10 +87,12 @@ export const OFFICIALS: Official[] = [
     category: 'opposition',
     avatar: '/avatars/peter-obi.jpg',
     state: 'Anambra State',
-    trustIndex: 72.10,
+    trustIndex: 72.1,
     change24h: +4.84,
     change7d: +6.12,
     ratingsCount: 24910,
+    upvotesCount: 18433,
+    downvotesCount: 6477,
     approval: { positive: 74, neutral: 16, negative: 10 },
     radar: {
       economy: 78.5,
@@ -128,10 +132,12 @@ export const OFFICIALS: Official[] = [
     category: 'minister',
     avatar: '/avatars/tunji-ojo.jpg',
     state: 'Ondo State',
-    trustIndex: 74.50,
+    trustIndex: 74.5,
     change24h: +5.30,
     change7d: +8.40,
     ratingsCount: 16820,
+    upvotesCount: 13120,
+    downvotesCount: 3700,
     approval: { positive: 78, neutral: 14, negative: 8 },
     radar: {
       economy: 65.0,
@@ -171,10 +177,12 @@ export const OFFICIALS: Official[] = [
     category: 'governor',
     avatar: '/avatars/alex-otti.jpg',
     state: 'Abia State',
-    trustIndex: 76.80,
+    trustIndex: 76.8,
     change24h: +3.80,
     change7d: +5.60,
     ratingsCount: 14320,
+    upvotesCount: 11599,
+    downvotesCount: 2721,
     approval: { positive: 81, neutral: 12, negative: 7 },
     radar: {
       economy: 82.0,
@@ -214,10 +222,12 @@ export const OFFICIALS: Official[] = [
     category: 'governor',
     avatar: '/avatars/sanwo-olu.jpg',
     state: 'Lagos State',
-    trustIndex: 62.15,
+    trustIndex: 62.2,
     change24h: +1.60,
     change7d: +2.40,
     ratingsCount: 21800,
+    upvotesCount: 13298,
+    downvotesCount: 8502,
     approval: { positive: 61, neutral: 22, negative: 17 },
     radar: {
       economy: 72.0,
@@ -227,7 +237,7 @@ export const OFFICIALS: Official[] = [
       infrastructure: 79.5,
       integrity: 56.0
     },
-    sparkline: [58.4, 59.2, 60.1, 60.8, 61.2, 61.8, 62.15],
+    sparkline: [58.4, 59.2, 60.1, 60.8, 61.2, 61.8, 62.2],
     bio: 'Governor of Lagos State championing the THEMES+ development agenda. Overseeing the operational launch of both the Lagos Blue Rail and Red Rail transit networks.',
     assumedOffice: 'May 29, 2019',
     keyInitiatives: [
@@ -257,10 +267,12 @@ export const OFFICIALS: Official[] = [
     category: 'minister',
     avatar: '/avatars/bosun-tijani.jpg',
     state: 'Ogun State',
-    trustIndex: 68.40,
+    trustIndex: 68.4,
     change24h: +2.90,
     change7d: +4.10,
     ratingsCount: 11200,
+    upvotesCount: 7840,
+    downvotesCount: 3360,
     approval: { positive: 70, neutral: 18, negative: 12 },
     radar: {
       economy: 71.0,
@@ -271,7 +283,7 @@ export const OFFICIALS: Official[] = [
       integrity: 76.0
     },
     sparkline: [62.0, 63.5, 64.8, 66.2, 67.0, 67.8, 68.4],
-    bio: 'Tech entrepreneur and co-founder of Co-Creation Hub (CcHUB) now leading Nigeria’s 3MTT (Three Million Technical Talents) program and National Artificial Intelligence Strategy.',
+    bio: 'Tech entrepreneur and co-founder of Co-Creation Hub (CcHUB) now leading Nigeria’s 3MTT program and National AI Strategy.',
     assumedOffice: 'August 21, 2023',
     keyInitiatives: [
       '3MTT Initiative (3 Million Technical Talents Training)',
@@ -300,10 +312,12 @@ export const OFFICIALS: Official[] = [
     category: 'minister',
     avatar: '/avatars/wike.jpg',
     state: 'Rivers State',
-    trustIndex: 48.70,
+    trustIndex: 48.7,
     change24h: -1.30,
     change7d: +2.10,
     ratingsCount: 17540,
+    upvotesCount: 8594,
+    downvotesCount: 8946,
     approval: { positive: 49, neutral: 21, negative: 30 },
     radar: {
       economy: 54.0,
@@ -343,10 +357,12 @@ export const OFFICIALS: Official[] = [
     category: 'governor',
     avatar: '/avatars/soludo.jpg',
     state: 'Anambra State',
-    trustIndex: 65.30,
+    trustIndex: 65.3,
     change24h: +2.10,
     change7d: +3.40,
     ratingsCount: 12900,
+    upvotesCount: 8256,
+    downvotesCount: 4644,
     approval: { positive: 64, neutral: 20, negative: 16 },
     radar: {
       economy: 74.0,
@@ -378,92 +394,6 @@ export const OFFICIALS: Official[] = [
     ]
   },
   {
-    id: 'shettima',
-    name: 'Kashim Shettima',
-    role: 'Vice President, Federal Republic of Nigeria',
-    party: 'APC',
-    partyColor: '#10B981',
-    category: 'executive',
-    avatar: '/avatars/shettima.jpg',
-    state: 'Borno State',
-    trustIndex: 58.20,
-    change24h: +1.40,
-    change7d: +2.80,
-    ratingsCount: 13900,
-    approval: { positive: 58, neutral: 24, negative: 18 },
-    radar: {
-      economy: 62.0,
-      security: 66.0,
-      healthcare: 50.0,
-      education: 58.0,
-      infrastructure: 64.0,
-      integrity: 55.0
-    },
-    sparkline: [54.0, 55.2, 56.1, 56.9, 57.4, 57.9, 58.2],
-    bio: '15th Vice President of Nigeria. Former Governor of Borno State and Senator. Coordinating national economic councils, MSME clinics, and agro-allied investments.',
-    assumedOffice: 'May 29, 2023',
-    keyInitiatives: [
-      'National MSME Expanded Access Fund',
-      'Food Security Agricultural Value Chain Coordination',
-      'Special Economic Zone Incentives'
-    ],
-    recentReviews: [
-      {
-        id: 'sh1',
-        author: 'Zainab Mai-Kano',
-        state: 'Borno State',
-        rating: 4,
-        comment: 'Active coordination of the National Economic Council meetings has kept governors aligned on agricultural interventions.',
-        timeAgo: '1d ago',
-        isVerified: true,
-        upvotes: 84
-      }
-    ]
-  },
-  {
-    id: 'gbajabiamila',
-    name: 'Femi Gbajabiamila',
-    role: 'Chief of Staff to the President',
-    party: 'APC',
-    partyColor: '#10B981',
-    category: 'executive',
-    avatar: '/avatars/gbajabiamila.jpg',
-    state: 'Lagos State',
-    trustIndex: 38.75,
-    change24h: +1.89,
-    change7d: +1.10,
-    ratingsCount: 10400,
-    approval: { positive: 45, neutral: 28, negative: 27 },
-    radar: {
-      economy: 48.0,
-      security: 42.0,
-      healthcare: 38.0,
-      education: 50.0,
-      infrastructure: 54.0,
-      integrity: 42.0
-    },
-    sparkline: [36.2, 36.8, 37.1, 37.9, 38.1, 38.4, 38.75],
-    bio: 'Former Speaker of the 9th House of Representatives. Key administrative coordinator managing presidential executive actions and legislative coordination.',
-    assumedOffice: 'June 14, 2023',
-    keyInitiatives: [
-      'Presidential Executive Coordination Framework',
-      'Federal Cabinet Performance Delivery Unit',
-      'Legislative-Executive Harmonization'
-    ],
-    recentReviews: [
-      {
-        id: 'gb1',
-        author: 'Gbenga Adebayo',
-        state: 'Lagos State',
-        rating: 3,
-        comment: 'Experienced parliamentarian whose legislative experience aids executive bills through the National Assembly.',
-        timeAgo: '2d ago',
-        isVerified: true,
-        upvotes: 62
-      }
-    ]
-  },
-  {
     id: 'atiku',
     name: 'Atiku Abubakar',
     role: 'Former Vice President & PDP Leader',
@@ -472,10 +402,12 @@ export const OFFICIALS: Official[] = [
     category: 'opposition',
     avatar: '/avatars/atiku.jpg',
     state: 'Adamawa State',
-    trustIndex: 43.20,
+    trustIndex: 43.2,
     change24h: -1.82,
     change7d: -2.30,
     ratingsCount: 15300,
+    upvotesCount: 6426,
+    downvotesCount: 8874,
     approval: { positive: 42, neutral: 27, negative: 31 },
     radar: {
       economy: 66.0,
@@ -515,10 +447,12 @@ export const OFFICIALS: Official[] = [
     category: 'opposition',
     avatar: '/avatars/kwankwaso.jpg',
     state: 'Kano State',
-    trustIndex: 50.20,
+    trustIndex: 50.2,
     change24h: +2.45,
     change7d: +3.10,
     ratingsCount: 11400,
+    upvotesCount: 6384,
+    downvotesCount: 5016,
     approval: { positive: 56, neutral: 24, negative: 20 },
     radar: {
       economy: 54.0,
@@ -565,6 +499,8 @@ export const AGENCIES: Agency[] = [
     change24h: +12.4,
     change7d: +14.2,
     ratingsCount: 22400,
+    upvotesCount: 17472,
+    downvotesCount: 4928,
     metrics: {
       transparency: 85.3,
       effectiveness: 89.1,
@@ -600,6 +536,8 @@ export const AGENCIES: Agency[] = [
     change24h: +2.4,
     change7d: +3.8,
     ratingsCount: 28900,
+    upvotesCount: 19652,
+    downvotesCount: 9248,
     metrics: {
       transparency: 66.0,
       effectiveness: 74.0,
@@ -635,6 +573,8 @@ export const AGENCIES: Agency[] = [
     change24h: +1.8,
     change7d: -2.1,
     ratingsCount: 34500,
+    upvotesCount: 20010,
+    downvotesCount: 14490,
     metrics: {
       transparency: 62.0,
       effectiveness: 64.5,
@@ -670,6 +610,8 @@ export const AGENCIES: Agency[] = [
     change24h: -6.7,
     change7d: -4.2,
     ratingsCount: 31200,
+    upvotesCount: 12480,
+    downvotesCount: 18720,
     metrics: {
       transparency: 42.1,
       effectiveness: 48.0,
@@ -705,6 +647,8 @@ export const AGENCIES: Agency[] = [
     change24h: +3.1,
     change7d: +5.4,
     ratingsCount: 26800,
+    upvotesCount: 14740,
+    downvotesCount: 12060,
     metrics: {
       transparency: 68.0,
       effectiveness: 60.5,
@@ -740,6 +684,8 @@ export const AGENCIES: Agency[] = [
     change24h: +3.2,
     change7d: +5.1,
     ratingsCount: 19100,
+    upvotesCount: 15089,
+    downvotesCount: 4011,
     metrics: {
       transparency: 82.0,
       effectiveness: 83.5,
@@ -775,6 +721,8 @@ export const AGENCIES: Agency[] = [
     change24h: +4.1,
     change7d: +6.3,
     ratingsCount: 14800,
+    upvotesCount: 11248,
+    downvotesCount: 3552,
     metrics: {
       transparency: 81.0,
       effectiveness: 82.5,
@@ -810,6 +758,8 @@ export const AGENCIES: Agency[] = [
     change24h: +3.8,
     change7d: +5.0,
     ratingsCount: 16200,
+    upvotesCount: 13284,
+    downvotesCount: 2916,
     metrics: {
       transparency: 88.0,
       effectiveness: 86.5,
@@ -831,6 +781,156 @@ export const AGENCIES: Agency[] = [
         upvotes: 110
       }
     ]
+  }
+];
+
+export const FORUM_POSTS: ForumPost[] = [
+  {
+    id: 'post-1',
+    author: 'Amina Yusuf',
+    handle: '@amina_lagos',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+    isVerified: true,
+    state: 'Lagos State',
+    timestamp: '25m ago',
+    content: 'Just collected my international passport at the Alausa passport office today. Applied online 10 days ago, zero agent extortion, no underground payments. We must give credit when reform works.',
+    taggedEntity: {
+      name: 'Dr. Olubunmi Tunji-Ojo',
+      role: 'Minister of Interior',
+      type: 'official',
+      voteAction: 'uprated',
+    },
+    upvotes: 842,
+    downvotes: 19,
+    repliesCount: 38,
+    sharesCount: 112,
+    replies: [
+      {
+        id: 'rep-1',
+        author: 'Tunde Bakare',
+        handle: '@tundebakare_ng',
+        isVerified: true,
+        state: 'Ogun State',
+        timestamp: '18m ago',
+        content: 'Can confirm 100%. Did mine in Abeokuta last week without paying a kobo extra. The tracking system actually works now.',
+        upvotes: 156,
+      },
+      {
+        id: 'rep-2',
+        author: 'Anonymous Citizen',
+        handle: '@citizen_9941',
+        isVerified: false,
+        state: 'FCT Abuja',
+        timestamp: '12m ago',
+        content: 'Now let him apply this exact same automation to federal correctional centers and civil marriage registries.',
+        upvotes: 84,
+      }
+    ]
+  },
+  {
+    id: 'post-2',
+    author: 'Chinedu Okafor',
+    handle: '@chinedu_aba',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
+    isVerified: true,
+    state: 'Abia State',
+    timestamp: '1h ago',
+    content: 'Aba commercial areas on the Geometric ring-fence had uninterrupted power for 4 days straight now. Artisans and shoe manufacturers on Ariaria are saving millions on diesel. This is the definition of sub-national execution.',
+    taggedEntity: {
+      name: 'Dr. Alex Otti',
+      role: 'Governor of Abia State',
+      type: 'official',
+      voteAction: 'uprated',
+    },
+    upvotes: 1240,
+    downvotes: 42,
+    repliesCount: 64,
+    sharesCount: 230,
+    replies: [
+      {
+        id: 'rep-3',
+        author: 'Emeka Nwosu',
+        handle: '@emeka_nwosu',
+        isVerified: true,
+        state: 'Imo State',
+        timestamp: '45m ago',
+        content: 'Neighboring South East states should understudy the Aba ring-fencing model immediately. Decentralized power is the only way forward.',
+        upvotes: 195,
+      }
+    ]
+  },
+  {
+    id: 'post-3',
+    author: 'Anonymous Whistleblower',
+    handle: '@civic_voice_ng',
+    isVerified: true,
+    state: 'Rivers State',
+    timestamp: '2h ago',
+    content: 'Crude supply allocation transparency to domestic modular and large-scale refineries remains completely opaque. If we want fuel prices below 700 Naira/L, local crude pricing in local currency must be enforced without middlemen sabotage.',
+    taggedEntity: {
+      name: 'NNPCL',
+      role: 'Nigerian National Petroleum Company Ltd',
+      type: 'agency',
+      voteAction: 'downrated',
+    },
+    upvotes: 2150,
+    downvotes: 180,
+    repliesCount: 142,
+    sharesCount: 489,
+    replies: [
+      {
+        id: 'rep-4',
+        author: 'Babatunde F.',
+        handle: '@tunde_energy',
+        isVerified: true,
+        state: 'Lagos State',
+        timestamp: '1h ago',
+        content: 'Until crude sale in Naira is 100% audited by independent civic monitors, FX pressures will continue distorting pump prices.',
+        upvotes: 310,
+      }
+    ]
+  },
+  {
+    id: 'post-4',
+    author: 'Danjuma Bako',
+    handle: '@danjuma_kad',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
+    isVerified: true,
+    state: 'Kaduna State',
+    timestamp: '3h ago',
+    content: 'Highway patrol response time between Katari and Rijana on the Kaduna-Abuja expressway has noticeably improved. Joint patrol squads with drones are active today. Security operatives holding the line deserve citizen acknowledgment.',
+    taggedEntity: {
+      name: 'Nigeria Police Force',
+      role: 'NPF Command',
+      type: 'agency',
+      voteAction: 'uprated',
+    },
+    upvotes: 680,
+    downvotes: 95,
+    repliesCount: 29,
+    sharesCount: 76,
+    replies: []
+  },
+  {
+    id: 'post-5',
+    author: 'Kemi Adeleke',
+    handle: '@kemi_adeleke',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80',
+    isVerified: true,
+    state: 'Oyo State',
+    timestamp: '5h ago',
+    content: 'Student loan allowance (NELFUND) hit bank accounts of several University of Ibadan students this morning. 20,000 Naira monthly upkeep stipend helps keep indigent students in school during these economic challenges.',
+    taggedEntity: {
+      name: 'Bola Ahmed Tinubu',
+      role: 'President of Nigeria',
+      type: 'official',
+      voteAction: 'uprated',
+    },
+    upvotes: 1540,
+    downvotes: 320,
+    repliesCount: 88,
+    sharesCount: 215,
+    replies: []
   }
 ];
 

@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
-  TrendingUp, 
   Users, 
   Building2, 
   Award, 
@@ -9,8 +8,11 @@ import {
   Sparkles, 
   ArrowUpRight, 
   ArrowDownRight,
+  ArrowBigUp,
+  ArrowBigDown,
   ShieldCheck,
-  Flame
+  Flame,
+  Activity
 } from 'lucide-react';
 import { Sparkline } from './Sparkline';
 import { 
@@ -34,14 +36,60 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onNavigateTab,
   onOpenVerification,
 }) => {
-  const topGainers = [...OFFICIALS].sort((a, b) => b.change24h - a.change24h).slice(0, 3);
+  const [officialsList, setOfficialsList] = useState(OFFICIALS);
+  const topGainers = [...officialsList].sort((a, b) => b.change24h - a.change24h).slice(0, 4);
+
+  const handleQuickVote = (e: React.MouseEvent, officialId: string, direction: 'up' | 'down') => {
+    e.stopPropagation();
+    triggerHaptic('medium');
+
+    setOfficialsList((prev) =>
+      prev.map((o) => {
+        if (o.id !== officialId) return o;
+        const currentVote = o.userVote;
+        let newScore = o.trustIndex;
+        let upvotes = o.upvotesCount;
+        let downvotes = o.downvotesCount;
+        let userVote: 'up' | 'down' | undefined = direction;
+
+        if (currentVote === direction) {
+          // undo vote
+          userVote = undefined;
+          if (direction === 'up') {
+            upvotes--;
+            newScore = Math.max(1, newScore - 0.5);
+          } else {
+            downvotes--;
+            newScore = Math.min(100, newScore + 0.5);
+          }
+        } else {
+          if (direction === 'up') {
+            upvotes++;
+            if (currentVote === 'down') downvotes--;
+            newScore = Math.min(100, newScore + 0.8);
+          } else {
+            downvotes++;
+            if (currentVote === 'up') upvotes--;
+            newScore = Math.max(1, newScore - 0.8);
+          }
+        }
+
+        return {
+          ...o,
+          trustIndex: Number(newScore.toFixed(1)),
+          upvotesCount: upvotes,
+          downvotesCount: downvotes,
+          userVote,
+        };
+      })
+    );
+  };
 
   return (
     <div className="space-y-5 pb-24">
       {/* 1. National Confidence Index Hero Card */}
       <section className="px-4">
         <div className="relative overflow-hidden rounded-3xl glass-panel p-5 border border-white/[0.08] shadow-2xl">
-          {/* Subtle Ambient Glow */}
           <div className="absolute -top-16 -right-16 w-44 h-44 bg-[#00E676]/15 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex items-start justify-between">
@@ -124,19 +172,50 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
-      {/* 3. Political Stock Market Ticker Section */}
+      {/* 3. The People's Voice Center Shortcut */}
+      <section className="px-4">
+        <div 
+          onClick={() => {
+            triggerHaptic('medium');
+            onNavigateTab('forum');
+          }}
+          className="rounded-3xl p-4 glass-panel border border-[#00E676]/30 bg-gradient-to-r from-emerald-950/50 via-[#0B1510] to-slate-900/60 flex items-center justify-between cursor-pointer hover:border-[#00E676]/60 transition-all shadow-xl"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-[#00E676] text-black flex items-center justify-center shadow-lg shadow-[#00E676]/30 animate-pulse">
+              <Activity className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-white uppercase tracking-wider font-['Outfit']">
+                  The People's Voice Forum
+                </span>
+                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-[#00E676]">
+                  Live
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-300 mt-0.5">
+                Speak truth to power • Uprate or downrate without fear of censorship
+              </p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-[#00E676]" />
+        </div>
+      </section>
+
+      {/* 4. Accountability Index & Quick Uprate/Downrate Section */}
       <section className="px-4">
         <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-1.5">
-            <TrendingUp className="w-4 h-4 text-[#00E676]" />
+            <ShieldCheck className="w-4 h-4 text-[#00E676]" />
             <h3 className="text-sm font-bold uppercase tracking-wider text-white font-['Outfit']">
-              Political Stock Market
+              Citizen Accountability Index (1 - 100)
             </h3>
           </div>
           <button
             onClick={() => {
               triggerHaptic('selection');
-              onNavigateTab('markets');
+              onNavigateTab('officials');
             }}
             className="text-xs font-semibold text-[#00E676] hover:underline flex items-center gap-0.5"
           >
@@ -145,7 +224,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </button>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {topGainers.map((official) => {
             const isPositive = official.change24h >= 0;
             return (
@@ -165,7 +244,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       className="w-11 h-11 rounded-full object-cover ring-2 ring-white/10"
                     />
                     <span
-                      className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded text-[9px] font-bold text-white uppercase"
+                      className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded text-[8px] font-bold text-white uppercase"
                       style={{ backgroundColor: official.partyColor }}
                     >
                       {official.party}
@@ -182,32 +261,46 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="hidden sm:block">
-                    <Sparkline
-                      data={official.sparkline}
-                      width={65}
-                      height={28}
-                      isPositive={isPositive}
-                      showDot={false}
-                    />
-                  </div>
-
-                  <div className="text-right min-w-[70px]">
-                    <div className="text-sm font-bold text-white font-mono">
-                      ₦{official.trustIndex.toFixed(2)}
+                  {/* Rating Score out of 100 (NO NAIRA) */}
+                  <div className="text-right min-w-[65px]">
+                    <div className="text-sm font-extrabold text-white font-mono">
+                      {official.trustIndex.toFixed(1)}
+                      <span className="text-[10px] text-slate-400 font-normal">/100</span>
                     </div>
                     <div
-                      className={`text-[11px] font-semibold flex items-center justify-end gap-0.5 ${
+                      className={`text-[10px] font-semibold flex items-center justify-end gap-0.5 ${
                         isPositive ? 'text-[#00E676]' : 'text-red-400'
                       }`}
                     >
-                      {isPositive ? (
-                        <ArrowUpRight className="w-3 h-3" />
-                      ) : (
-                        <ArrowDownRight className="w-3 h-3" />
-                      )}
+                      {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                       <span>{isPositive ? `+${official.change24h}%` : `${official.change24h}%`}</span>
                     </div>
+                  </div>
+
+                  {/* Direct Uprate (▲) & Downrate (▼) Buttons */}
+                  <div className="flex flex-col gap-1 pl-1">
+                    <button
+                      onClick={(e) => handleQuickVote(e, official.id, 'up')}
+                      className={`p-1 rounded-lg transition-colors ${
+                        official.userVote === 'up'
+                          ? 'bg-[#00E676] text-black shadow-md'
+                          : 'bg-white/[0.05] text-slate-400 hover:text-[#00E676] hover:bg-white/[0.09]'
+                      }`}
+                      aria-label="Uprate official"
+                    >
+                      <ArrowBigUp className="w-4 h-4 fill-current" />
+                    </button>
+                    <button
+                      onClick={(e) => handleQuickVote(e, official.id, 'down')}
+                      className={`p-1 rounded-lg transition-colors ${
+                        official.userVote === 'down'
+                          ? 'bg-red-500 text-white shadow-md'
+                          : 'bg-white/[0.05] text-slate-400 hover:text-red-400 hover:bg-white/[0.09]'
+                      }`}
+                      aria-label="Downrate official"
+                    >
+                      <ArrowBigDown className="w-4 h-4 fill-current" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -216,7 +309,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
-      {/* 4. AI Daily Civic Brief Card */}
+      {/* 5. AI Daily Civic Brief Card */}
       <section className="px-4">
         <div className="rounded-3xl glass-panel p-4 border border-blue-500/20 bg-gradient-to-br from-blue-950/30 to-purple-950/20">
           <div className="flex items-center justify-between mb-2">
@@ -251,7 +344,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
-      {/* 5. Trending Issues Now */}
+      {/* 6. Trending Issues Now */}
       <section className="px-4">
         <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-1.5">
@@ -296,7 +389,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
-      {/* 6. Anonymous Civic Power Banner */}
+      {/* 7. Anonymous Civic Power Banner */}
       <section className="px-4">
         <div className="rounded-3xl p-4 glass-panel border border-emerald-500/20 bg-gradient-to-r from-emerald-950/40 to-slate-900/60 flex items-center justify-between">
           <div>

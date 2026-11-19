@@ -93,7 +93,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
 
         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[#00E676] text-xs font-bold font-mono">
           <TrendingUp className="w-3.5 h-3.5" />
-          <span>PPI ₦1,254.36</span>
+          <span>PPI 1,254.36</span>
         </div>
       </div>
 
@@ -113,9 +113,9 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
       <div className="rounded-3xl glass-panel p-4 border border-white/[0.08]">
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div>
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider">Market Cap (Trust)</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider">Citizen Audits</span>
             <div className="text-lg font-extrabold text-white font-mono mt-0.5">
-              {PLATFORM_STATS.marketCapTrust}
+              {PLATFORM_STATS.totalCitizenAudits}
             </div>
             <span className="text-[10px] text-[#00E676] font-semibold flex items-center gap-0.5">
               <ArrowUpRight className="w-3 h-3" /> +2.31% Today
@@ -276,7 +276,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
 
                 <div className="text-right min-w-[70px]">
                   <div className="text-sm font-bold text-white font-mono">
-                    ₦{asset.price.toFixed(2)}
+                    {asset.price.toFixed(1)} / 100
                   </div>
                   <div
                     className={`text-[11px] font-semibold flex items-center justify-end gap-0.5 ${

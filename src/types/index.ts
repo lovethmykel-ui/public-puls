@@ -1,4 +1,4 @@
-export type NavTab = 'home' | 'markets' | 'officials' | 'elections' | 'profile';
+export type NavTab = 'home' | 'officials' | 'forum' | 'elections' | 'profile';
 
 export interface Official {
   id: string;
@@ -9,10 +9,13 @@ export interface Official {
   category: 'executive' | 'governor' | 'minister' | 'legislative' | 'opposition';
   avatar: string;
   state: string;
-  trustIndex: number; // e.g., 61.45
-  change24h: number;   // e.g., +3.56
+  trustIndex: number; // Rating out of 100 (e.g. 61.5)
+  change24h: number;   // e.g. +3.56%
   change7d: number;
   ratingsCount: number;
+  upvotesCount: number;
+  downvotesCount: number;
+  userVote?: 'up' | 'down' | null;
   approval: {
     positive: number;
     neutral: number;
@@ -42,10 +45,13 @@ export interface Agency {
   sector: string;
   category: 'security' | 'economy' | 'regulatory' | 'infrastructure' | 'social' | 'enforcement';
   logo: string;
-  trustIndex: number;
+  trustIndex: number; // Rating out of 100 (e.g. 87.6)
   change24h: number;
   change7d: number;
   ratingsCount: number;
+  upvotesCount: number;
+  downvotesCount: number;
+  userVote?: 'up' | 'down' | null;
   metrics: {
     transparency: number;
     effectiveness: number;
@@ -71,6 +77,41 @@ export interface Review {
   timeAgo: string;
   isVerified: boolean;
   upvotes: number;
+}
+
+export interface ForumReply {
+  id: string;
+  author: string;
+  handle: string;
+  isVerified: boolean;
+  state: string;
+  timestamp: string;
+  content: string;
+  upvotes: number;
+  hasUpvoted?: boolean;
+}
+
+export interface ForumPost {
+  id: string;
+  author: string;
+  handle: string;
+  avatar?: string;
+  isVerified: boolean;
+  state: string;
+  timestamp: string;
+  content: string;
+  taggedEntity?: {
+    name: string;
+    role: string;
+    type: 'official' | 'agency';
+    voteAction: 'uprated' | 'downrated' | 'neutral';
+  };
+  upvotes: number;
+  downvotes: number;
+  userVote?: 'up' | 'down';
+  repliesCount: number;
+  sharesCount: number;
+  replies: ForumReply[];
 }
 
 export interface Candidate {

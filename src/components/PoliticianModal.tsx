@@ -9,7 +9,9 @@ import {
   Star,
   CheckCircle2,
   Calendar,
-  ThumbsUp
+  ThumbsUp,
+  ArrowBigUp,
+  ArrowBigDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkline } from './Sparkline';
@@ -31,8 +33,26 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
   const [activeTab, setActiveTab] = useState<'overview' | 'performance' | 'reviews'>('overview');
   const [selectedTimeframe, setSelectedTimeframe] = useState<'1D' | '1W' | '1M' | '3M' | '1Y' | 'ALL'>('1W');
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [userVote, setUserVote] = useState<'up' | 'down' | null>(official?.userVote || null);
+  const [upvotes, setUpvotes] = useState(official?.upvotesCount || 1420);
+  const [downvotes, setDownvotes] = useState(official?.downvotesCount || 340);
 
   if (!official) return null;
+
+  const handleVote = (direction: 'up' | 'down') => {
+    triggerHaptic('medium');
+    if (userVote === direction) {
+      setUserVote(null);
+      if (direction === 'up') setUpvotes((v) => Math.max(0, v - 1));
+      else setDownvotes((v) => Math.max(0, v - 1));
+    } else {
+      if (userVote === 'up') setUpvotes((v) => Math.max(0, v - 1));
+      if (userVote === 'down') setDownvotes((v) => Math.max(0, v - 1));
+      setUserVote(direction);
+      if (direction === 'up') setUpvotes((v) => v + 1);
+      else setDownvotes((v) => v + 1);
+    }
+  };
 
   const isPositive = official.change24h >= 0;
 
@@ -158,8 +178,11 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                       <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
                         Public Trust Index
                       </span>
-                      <div className="text-3xl font-extrabold text-white font-mono mt-1">
-                        ₦{official.trustIndex.toFixed(2)}
+                      <div className="flex items-baseline gap-1 mt-1">
+                        <span className="text-3xl font-extrabold text-white font-mono">
+                          {official.trustIndex.toFixed(1)}
+                        </span>
+                        <span className="text-xs font-semibold text-slate-400 font-mono">/ 100</span>
                       </div>
                     </div>
 
@@ -228,6 +251,45 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                       <div className="text-base font-bold text-red-400">{official.approval.negative}%</div>
                       <div className="text-[10px] text-slate-400">Negative</div>
                     </div>
+                  </div>
+                </div>
+
+                {/* Instant Citizen Accountability Voting */}
+                <div className="rounded-2xl glass-panel p-3.5 border border-white/[0.08] bg-white/[0.02]">
+                  <div className="flex items-center justify-between mb-2.5">
+                    <div>
+                      <span className="text-xs font-bold text-white font-['Outfit'] block">Citizen Direct Vote</span>
+                      <span className="text-[10px] text-slate-400">Encrypted, non-traceable one-tap vote</span>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      Zero-Knowledge
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <button
+                      onClick={() => handleVote('up')}
+                      className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all active:scale-95 ${
+                        userVote === 'up'
+                          ? 'bg-emerald-500/25 border-[#00E676] text-[#00E676] shadow-lg shadow-emerald-500/20'
+                          : 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:text-white hover:bg-emerald-500/10'
+                      }`}
+                    >
+                      <ArrowBigUp className={`w-4 h-4 ${userVote === 'up' ? 'fill-[#00E676]' : ''}`} />
+                      <span>Uprate ({upvotes.toLocaleString()})</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleVote('down')}
+                      className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all active:scale-95 ${
+                        userVote === 'down'
+                          ? 'bg-red-500/25 border-red-500 text-red-400 shadow-lg shadow-red-500/20'
+                          : 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:text-white hover:bg-red-500/10'
+                      }`}
+                    >
+                      <ArrowBigDown className={`w-4 h-4 ${userVote === 'down' ? 'fill-red-400' : ''}`} />
+                      <span>Downrate ({downvotes.toLocaleString()})</span>
+                    </button>
                   </div>
                 </div>
 

@@ -147,8 +147,11 @@ export const AgencyModal: React.FC<AgencyModalProps> = ({
                       <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
                         Institutional Trust Score
                       </span>
-                      <div className="text-3xl font-extrabold text-white font-mono mt-1">
-                        {agency.trustIndex.toFixed(1)}%
+                      <div className="flex items-baseline gap-1 mt-1">
+                        <span className="text-3xl font-extrabold text-white font-mono">
+                          {agency.trustIndex.toFixed(1)}
+                        </span>
+                        <span className="text-xs font-semibold text-slate-400 font-mono">/ 100</span>
                       </div>
                     </div>
 

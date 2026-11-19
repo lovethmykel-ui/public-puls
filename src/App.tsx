@@ -4,7 +4,7 @@ import type { NavTab, Official, Agency } from './types';
 import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
 import { HomeView } from './components/HomeView';
-import { MarketsView } from './components/MarketsView';
+import { ForumView } from './components/ForumView';
 import { OfficialsView } from './components/OfficialsView';
 import { ElectionsView } from './components/ElectionsView';
 import { ProfileView } from './components/ProfileView';
@@ -79,12 +79,7 @@ export const App: React.FC = () => {
                 />
               )}
 
-              {activeTab === 'markets' && (
-                <MarketsView
-                  onSelectOfficial={(official) => setSelectedOfficial(official)}
-                  onSelectAgency={(agency) => setSelectedAgency(agency)}
-                />
-              )}
+              {activeTab === 'forum' && <ForumView />}
 
               {activeTab === 'officials' && (
                 <OfficialsView

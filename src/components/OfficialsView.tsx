@@ -4,8 +4,10 @@ import {
   ShieldCheck, 
   Star, 
   Building2,
-  ArrowUpRight,
-  ArrowDownRight
+  ArrowUpRight, 
+  ArrowDownRight,
+  ArrowBigUp,
+  ArrowBigDown
 } from 'lucide-react';
 import { OFFICIALS, AGENCIES } from '../data/mockData';
 import type { Official, Agency } from '../types';
@@ -22,10 +24,86 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
   onSelectAgency,
   onOpenRateModal,
 }) => {
+  const [officialsList, setOfficialsList] = useState<Official[]>(OFFICIALS);
+  const [agenciesList, setAgenciesList] = useState<Agency[]>(AGENCIES);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'executive' | 'governors' | 'ministers' | 'agencies'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredOfficials = OFFICIALS.filter((official) => {
+  const handleOfficialVote = (e: React.MouseEvent, officialId: string, direction: 'up' | 'down') => {
+    e.stopPropagation();
+    triggerHaptic('medium');
+    setOfficialsList((prev) =>
+      prev.map((off) => {
+        if (off.id !== officialId) return off;
+
+        const currentVote = off.userVote;
+        let upvotes = off.upvotesCount || 100;
+        let downvotes = off.downvotesCount || 20;
+        let newVote: 'up' | 'down' | null = direction;
+
+        if (currentVote === direction) {
+          newVote = null;
+          if (direction === 'up') upvotes = Math.max(0, upvotes - 1);
+          else downvotes = Math.max(0, downvotes - 1);
+        } else {
+          if (currentVote === 'up') upvotes = Math.max(0, upvotes - 1);
+          if (currentVote === 'down') downvotes = Math.max(0, downvotes - 1);
+          if (direction === 'up') upvotes += 1;
+          else downvotes += 1;
+        }
+
+        const totalVotes = upvotes + downvotes;
+        const newTrust = totalVotes > 0 ? (upvotes / totalVotes) * 100 : off.trustIndex;
+
+        return {
+          ...off,
+          userVote: newVote,
+          upvotesCount: upvotes,
+          downvotesCount: downvotes,
+          trustIndex: Number(newTrust.toFixed(1)),
+        };
+      })
+    );
+  };
+
+  const handleAgencyVote = (e: React.MouseEvent, agencyId: string, direction: 'up' | 'down') => {
+    e.stopPropagation();
+    triggerHaptic('medium');
+    setAgenciesList((prev) =>
+      prev.map((ag) => {
+        if (ag.id !== agencyId) return ag;
+
+        const currentVote = ag.userVote;
+        let upvotes = ag.upvotesCount || 80;
+        let downvotes = ag.downvotesCount || 20;
+        let newVote: 'up' | 'down' | null = direction;
+
+        if (currentVote === direction) {
+          newVote = null;
+          if (direction === 'up') upvotes = Math.max(0, upvotes - 1);
+          else downvotes = Math.max(0, downvotes - 1);
+        } else {
+          if (currentVote === 'up') upvotes = Math.max(0, upvotes - 1);
+          if (currentVote === 'down') downvotes = Math.max(0, downvotes - 1);
+          if (direction === 'up') upvotes += 1;
+          else downvotes += 1;
+        }
+
+        const totalVotes = upvotes + downvotes;
+        const newTrust = totalVotes > 0 ? (upvotes / totalVotes) * 100 : ag.trustIndex;
+
+        return {
+          ...ag,
+          userVote: newVote,
+          upvotesCount: upvotes,
+          downvotesCount: downvotes,
+          trustIndex: Number(newTrust.toFixed(1)),
+        };
+      })
+    );
+  };
+
+  const filteredOfficials = officialsList.filter((official) => {
     if (selectedFilter === 'executive' && official.category !== 'executive') return false;
     if (selectedFilter === 'governors' && official.category !== 'governor') return false;
     if (selectedFilter === 'ministers' && official.category !== 'minister') return false;
@@ -44,7 +122,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
   });
 
   const showAgencies = selectedFilter === 'all' || selectedFilter === 'agencies';
-  const filteredAgencies = AGENCIES.filter((agency) => {
+  const filteredAgencies = agenciesList.filter((agency) => {
     if (searchQuery.trim().length > 0) {
       const q = searchQuery.toLowerCase();
       return (
@@ -64,7 +142,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
         <h2 className="text-xl font-bold tracking-tight text-white font-['Outfit']">
           Officials & Institutions Directory
         </h2>
-        <p className="text-xs text-slate-400">Public servants, cabinet ministers & state agencies</p>
+        <p className="text-xs text-slate-400">Public servants, cabinet ministers & state agencies (1 - 100 Index)</p>
       </div>
 
       {/* Search Input */}
@@ -149,9 +227,10 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <div className="text-sm font-bold text-white font-mono">
-                        {official.trustIndex.toFixed(1)}%
+                    <div className="text-right flex flex-col items-end">
+                      <div className="text-base font-extrabold text-white font-mono">
+                        {official.trustIndex.toFixed(1)}
+                        <span className="text-[10px] text-slate-400 font-normal">/100</span>
                       </div>
                       <div
                         className={`text-[10px] font-semibold flex items-center justify-end gap-0.5 mt-0.5 ${
@@ -161,22 +240,53 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                         {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                         <span>{isPositive ? `+${official.change24h}%` : `${official.change24h}%`}</span>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* One-Tap Uprate/Downrate & Rate Modal Action Strip */}
+                  <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-white/[0.06]">
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={(e) => handleOfficialVote(e, official.id, 'up')}
+                        className={`px-2.5 py-1 rounded-xl border text-xs font-semibold flex items-center gap-1 transition-all active:scale-95 ${
+                          official.userVote === 'up'
+                            ? 'bg-emerald-500/25 border-[#00E676] text-[#00E676] shadow-sm'
+                            : 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:text-white hover:bg-emerald-500/10'
+                        }`}
+                        title="Uprate official"
+                      >
+                        <ArrowBigUp className={`w-3.5 h-3.5 ${official.userVote === 'up' ? 'fill-[#00E676]' : ''}`} />
+                        <span>{(official.upvotesCount || 1420).toLocaleString()}</span>
+                      </button>
 
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          triggerHaptic('medium');
-                          onOpenRateModal({
-                            name: official.name,
-                            role: official.role,
-                            type: 'official',
-                          });
-                        }}
-                        className="mt-2.5 px-3 py-1 rounded-xl bg-white/[0.06] hover:bg-emerald-500/20 text-[#00E676] hover:text-emerald-300 border border-white/[0.08] hover:border-emerald-500/30 text-xs font-semibold active:scale-95 transition-all"
+                        onClick={(e) => handleOfficialVote(e, official.id, 'down')}
+                        className={`px-2.5 py-1 rounded-xl border text-xs font-semibold flex items-center gap-1 transition-all active:scale-95 ${
+                          official.userVote === 'down'
+                            ? 'bg-red-500/25 border-red-500 text-red-400 shadow-sm'
+                            : 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:text-white hover:bg-red-500/10'
+                        }`}
+                        title="Downrate official"
                       >
-                        Rate
+                        <ArrowBigDown className={`w-3.5 h-3.5 ${official.userVote === 'down' ? 'fill-red-400' : ''}`} />
+                        <span>{(official.downvotesCount || 340).toLocaleString()}</span>
                       </button>
                     </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerHaptic('medium');
+                        onOpenRateModal({
+                          name: official.name,
+                          role: official.role,
+                          type: 'official',
+                        });
+                      }}
+                      className="px-3 py-1 rounded-xl bg-white/[0.06] hover:bg-emerald-500/20 text-[#00E676] hover:text-emerald-300 border border-white/[0.08] text-xs font-semibold active:scale-95 transition-all"
+                    >
+                      Audit & Review
+                    </button>
                   </div>
                 </div>
               );
@@ -231,9 +341,10 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <div className="text-sm font-bold text-white font-mono">
-                          {agency.trustIndex.toFixed(1)}%
+                      <div className="text-right flex flex-col items-end">
+                        <div className="text-base font-extrabold text-white font-mono">
+                          {agency.trustIndex.toFixed(1)}
+                          <span className="text-[10px] text-slate-400 font-normal">/100</span>
                         </div>
                         <div
                           className={`text-[10px] font-semibold flex items-center justify-end gap-0.5 mt-0.5 ${
@@ -243,22 +354,53 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                           {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                           <span>{isPositive ? `+${agency.change24h}%` : `${agency.change24h}%`}</span>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Agency One-Tap Uprate/Downrate & Rate Modal */}
+                    <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-white/[0.06]">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={(e) => handleAgencyVote(e, agency.id, 'up')}
+                          className={`px-2.5 py-1 rounded-xl border text-xs font-semibold flex items-center gap-1 transition-all active:scale-95 ${
+                            agency.userVote === 'up'
+                              ? 'bg-blue-500/25 border-blue-400 text-blue-400 shadow-sm'
+                              : 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:text-white hover:bg-blue-500/10'
+                          }`}
+                          title="Uprate agency"
+                        >
+                          <ArrowBigUp className={`w-3.5 h-3.5 ${agency.userVote === 'up' ? 'fill-blue-400' : ''}`} />
+                          <span>{(agency.upvotesCount || 890).toLocaleString()}</span>
+                        </button>
 
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            triggerHaptic('medium');
-                            onOpenRateModal({
-                              name: agency.name,
-                              role: agency.headTitle,
-                              type: 'agency',
-                            });
-                          }}
-                          className="mt-2.5 px-3 py-1 rounded-xl bg-white/[0.06] hover:bg-emerald-500/20 text-[#00E676] hover:text-emerald-300 border border-white/[0.08] hover:border-emerald-500/30 text-xs font-semibold active:scale-95 transition-all"
+                          onClick={(e) => handleAgencyVote(e, agency.id, 'down')}
+                          className={`px-2.5 py-1 rounded-xl border text-xs font-semibold flex items-center gap-1 transition-all active:scale-95 ${
+                            agency.userVote === 'down'
+                              ? 'bg-red-500/25 border-red-500 text-red-400 shadow-sm'
+                              : 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:text-white hover:bg-red-500/10'
+                          }`}
+                          title="Downrate agency"
                         >
-                          Rate
+                          <ArrowBigDown className={`w-3.5 h-3.5 ${agency.userVote === 'down' ? 'fill-red-400' : ''}`} />
+                          <span>{(agency.downvotesCount || 190).toLocaleString()}</span>
                         </button>
                       </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          triggerHaptic('medium');
+                          onOpenRateModal({
+                            name: agency.name,
+                            role: agency.headTitle,
+                            type: 'agency',
+                          });
+                        }}
+                        className="px-3 py-1 rounded-xl bg-white/[0.06] hover:bg-blue-500/20 text-blue-400 hover:text-blue-300 border border-white/[0.08] text-xs font-semibold active:scale-95 transition-all"
+                      >
+                        Audit & Review
+                      </button>
                     </div>
                   </div>
                 );
