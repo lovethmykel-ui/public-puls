@@ -245,8 +245,12 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
                     </span>
                   </div>
                 ) : (
-                  <div className="w-11 h-11 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-xl">
-                    {asset.logo || <Building2 className="w-5 h-5 text-blue-400" />}
+                  <div className="w-11 h-11 rounded-2xl bg-white/[0.04] border border-white/[0.1] flex items-center justify-center overflow-hidden p-1.5 flex-shrink-0">
+                    {asset.logo ? (
+                      <img src={asset.logo} alt={asset.name} className="w-full h-full object-contain" />
+                    ) : (
+                      <Building2 className="w-5 h-5 text-blue-400" />
+                    )}
                   </div>
                 )}
 

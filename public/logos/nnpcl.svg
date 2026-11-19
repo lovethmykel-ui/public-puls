@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="nnpc-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#F59E0B" />
+      <stop offset="100%" stopColor="#D97706" />
+    </linearGradient>
+    <linearGradient id="nnpc-green" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#10B981" />
+      <stop offset="100%" stopColor="#047857" />
+    </linearGradient>
+    <linearGradient id="nnpc-flame" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#EF4444" />
+      <stop offset="60%" stopColor="#F59E0B" />
+      <stop offset="100%" stopColor="#FDE047" />
+    </linearGradient>
+  </defs>
+
+  <!-- Circular Outer Border -->
+  <circle cx="100" cy="100" r="94" fill="#0A1017" stroke="#047857" stroke-width="4" />
+  <circle cx="100" cy="100" r="86" fill="none" stroke="#F59E0B" stroke-width="2" />
+
+  <!-- Industrial Cogwheel Gear -->
+  <g fill="#1F2937" stroke="#374151" stroke-width="1.5">
+    <circle cx="100" cy="92" r="42" fill="#047857" />
+  </g>
+
+  <!-- Oil Derrick / Rig Silhouette -->
+  <path d="M 94 115 L 98 62 L 102 62 L 106 115 Z" fill="#FFFFFF" />
+  <line x1="95" y1="80" x2="105" y2="80" stroke="#047857" stroke-width="2" />
+  <line x1="94" y1="95" x2="106" y2="95" stroke="#047857" stroke-width="2" />
+  <line x1="93" y1="110" x2="107" y2="110" stroke="#047857" stroke-width="2" />
+
+  <!-- Energetic Gas Flame above derrick -->
+  <path d="M 100 42 C 92 52, 94 60, 100 66 C 106 60, 108 52, 100 42 Z" fill="url(#nnpc-flame)" />
+  
+  <!-- NNPCL Brand Typography -->
+  <rect x="52" y="132" width="96" height="28" rx="6" fill="#EF4444" stroke="#FFFFFF" stroke-width="1.5" />
+  <text x="100" y="152" font-family="'Outfit', sans-serif" font-size="16" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">
+    NNPCL
+  </text>
+  
+  <text x="100" y="174" font-family="'Inter', sans-serif" font-size="8" font-weight="700" fill="#94A3B8" text-anchor="middle" letter-spacing="1">
+    ENERGY FOR TOMORROW
+  </text>
+</svg>

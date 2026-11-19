@@ -29,7 +29,7 @@ export const OFFICIALS: Official[] = [
     party: 'APC',
     partyColor: '#10B981',
     category: 'executive',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+    avatar: '/avatars/tinubu.jpg',
     state: 'Lagos State',
     trustIndex: 61.45,
     change24h: +3.56,
@@ -83,7 +83,7 @@ export const OFFICIALS: Official[] = [
     party: 'LP',
     partyColor: '#F97316',
     category: 'opposition',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    avatar: '/avatars/peter-obi.jpg',
     state: 'Anambra State',
     trustIndex: 72.10,
     change24h: +4.84,
@@ -126,7 +126,7 @@ export const OFFICIALS: Official[] = [
     party: 'APC',
     partyColor: '#10B981',
     category: 'minister',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+    avatar: '/avatars/tunji-ojo.jpg',
     state: 'Ondo State',
     trustIndex: 74.50,
     change24h: +5.30,
@@ -169,7 +169,7 @@ export const OFFICIALS: Official[] = [
     party: 'LP',
     partyColor: '#F97316',
     category: 'governor',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80',
+    avatar: '/avatars/alex-otti.jpg',
     state: 'Abia State',
     trustIndex: 76.80,
     change24h: +3.80,
@@ -212,7 +212,7 @@ export const OFFICIALS: Official[] = [
     party: 'APC',
     partyColor: '#10B981',
     category: 'governor',
-    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80',
+    avatar: '/avatars/sanwo-olu.jpg',
     state: 'Lagos State',
     trustIndex: 62.15,
     change24h: +1.60,
@@ -255,7 +255,7 @@ export const OFFICIALS: Official[] = [
     party: 'Federal Cabinet',
     partyColor: '#3B82F6',
     category: 'minister',
-    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80',
+    avatar: '/avatars/bosun-tijani.jpg',
     state: 'Ogun State',
     trustIndex: 68.40,
     change24h: +2.90,
@@ -298,7 +298,7 @@ export const OFFICIALS: Official[] = [
     party: 'PDP / FEC',
     partyColor: '#DC2626',
     category: 'minister',
-    avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=400&q=80',
+    avatar: '/avatars/wike.jpg',
     state: 'Rivers State',
     trustIndex: 48.70,
     change24h: -1.30,
@@ -341,7 +341,7 @@ export const OFFICIALS: Official[] = [
     party: 'APGA',
     partyColor: '#EAB308',
     category: 'governor',
-    avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80',
+    avatar: '/avatars/soludo.jpg',
     state: 'Anambra State',
     trustIndex: 65.30,
     change24h: +2.10,
@@ -378,13 +378,99 @@ export const OFFICIALS: Official[] = [
     ]
   },
   {
+    id: 'shettima',
+    name: 'Kashim Shettima',
+    role: 'Vice President, Federal Republic of Nigeria',
+    party: 'APC',
+    partyColor: '#10B981',
+    category: 'executive',
+    avatar: '/avatars/shettima.jpg',
+    state: 'Borno State',
+    trustIndex: 58.20,
+    change24h: +1.40,
+    change7d: +2.80,
+    ratingsCount: 13900,
+    approval: { positive: 58, neutral: 24, negative: 18 },
+    radar: {
+      economy: 62.0,
+      security: 66.0,
+      healthcare: 50.0,
+      education: 58.0,
+      infrastructure: 64.0,
+      integrity: 55.0
+    },
+    sparkline: [54.0, 55.2, 56.1, 56.9, 57.4, 57.9, 58.2],
+    bio: '15th Vice President of Nigeria. Former Governor of Borno State and Senator. Coordinating national economic councils, MSME clinics, and agro-allied investments.',
+    assumedOffice: 'May 29, 2023',
+    keyInitiatives: [
+      'National MSME Expanded Access Fund',
+      'Food Security Agricultural Value Chain Coordination',
+      'Special Economic Zone Incentives'
+    ],
+    recentReviews: [
+      {
+        id: 'sh1',
+        author: 'Zainab Mai-Kano',
+        state: 'Borno State',
+        rating: 4,
+        comment: 'Active coordination of the National Economic Council meetings has kept governors aligned on agricultural interventions.',
+        timeAgo: '1d ago',
+        isVerified: true,
+        upvotes: 84
+      }
+    ]
+  },
+  {
+    id: 'gbajabiamila',
+    name: 'Femi Gbajabiamila',
+    role: 'Chief of Staff to the President',
+    party: 'APC',
+    partyColor: '#10B981',
+    category: 'executive',
+    avatar: '/avatars/gbajabiamila.jpg',
+    state: 'Lagos State',
+    trustIndex: 38.75,
+    change24h: +1.89,
+    change7d: +1.10,
+    ratingsCount: 10400,
+    approval: { positive: 45, neutral: 28, negative: 27 },
+    radar: {
+      economy: 48.0,
+      security: 42.0,
+      healthcare: 38.0,
+      education: 50.0,
+      infrastructure: 54.0,
+      integrity: 42.0
+    },
+    sparkline: [36.2, 36.8, 37.1, 37.9, 38.1, 38.4, 38.75],
+    bio: 'Former Speaker of the 9th House of Representatives. Key administrative coordinator managing presidential executive actions and legislative coordination.',
+    assumedOffice: 'June 14, 2023',
+    keyInitiatives: [
+      'Presidential Executive Coordination Framework',
+      'Federal Cabinet Performance Delivery Unit',
+      'Legislative-Executive Harmonization'
+    ],
+    recentReviews: [
+      {
+        id: 'gb1',
+        author: 'Gbenga Adebayo',
+        state: 'Lagos State',
+        rating: 3,
+        comment: 'Experienced parliamentarian whose legislative experience aids executive bills through the National Assembly.',
+        timeAgo: '2d ago',
+        isVerified: true,
+        upvotes: 62
+      }
+    ]
+  },
+  {
     id: 'atiku',
     name: 'Atiku Abubakar',
     role: 'Former Vice President & PDP Leader',
     party: 'PDP',
     partyColor: '#DC2626',
     category: 'opposition',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
+    avatar: '/avatars/atiku.jpg',
     state: 'Adamawa State',
     trustIndex: 43.20,
     change24h: -1.82,
@@ -427,7 +513,7 @@ export const OFFICIALS: Official[] = [
     party: 'NNPP',
     partyColor: '#EF4444',
     category: 'opposition',
-    avatar: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?auto=format&fit=crop&w=400&q=80',
+    avatar: '/avatars/kwankwaso.jpg',
     state: 'Kano State',
     trustIndex: 50.20,
     change24h: +2.45,
@@ -474,7 +560,7 @@ export const AGENCIES: Agency[] = [
     headTitle: 'Executive Chairman',
     sector: 'Anti-Corruption & Law Enforcement',
     category: 'enforcement',
-    logo: '🛡️',
+    logo: '/logos/efcc.jpg',
     trustIndex: 87.6,
     change24h: +12.4,
     change7d: +14.2,
@@ -502,41 +588,6 @@ export const AGENCIES: Agency[] = [
     ]
   },
   {
-    id: 'nnpcl',
-    name: 'Nigerian National Petroleum Company Limited',
-    acronym: 'NNPCL',
-    head: 'Mele Kyari',
-    headTitle: 'Group Chief Executive Officer',
-    sector: 'Energy & Natural Resources',
-    category: 'economy',
-    logo: '⛽',
-    trustIndex: 45.3,
-    change24h: -6.7,
-    change7d: -4.2,
-    ratingsCount: 31200,
-    metrics: {
-      transparency: 42.1,
-      effectiveness: 48.0,
-      integrity: 44.5,
-      publicPerception: 46.2
-    },
-    approval: { positive: 40, neutral: 22, negative: 38 },
-    sparkline: [52.0, 50.4, 49.0, 48.2, 47.0, 46.1, 45.3],
-    description: 'Commercial state oil company managing petroleum assets, crude supply to domestic refineries, and national energy security.',
-    recentReviews: [
-      {
-        id: 'n1',
-        author: 'Osato Igbinovia',
-        state: 'Edo State',
-        rating: 2,
-        comment: 'Crude supply to local refineries must be transparent. The fuel pricing adjustments need clearer communication to citizens.',
-        timeAgo: '7h ago',
-        isVerified: true,
-        upvotes: 210
-      }
-    ]
-  },
-  {
     id: 'npf',
     name: 'Nigeria Police Force',
     acronym: 'NPF',
@@ -544,7 +595,7 @@ export const AGENCIES: Agency[] = [
     headTitle: 'Inspector General of Police (IGP)',
     sector: 'Internal Security & Public Safety',
     category: 'security',
-    logo: '👮',
+    logo: '/logos/npf.jpg',
     trustIndex: 72.0,
     change24h: +2.4,
     change7d: +3.8,
@@ -579,7 +630,7 @@ export const AGENCIES: Agency[] = [
     headTitle: 'National Chairman',
     sector: 'Electoral Democracy & Governance',
     category: 'regulatory',
-    logo: '🗳️',
+    logo: '/logos/inec.svg',
     trustIndex: 63.2,
     change24h: +1.8,
     change7d: -2.1,
@@ -607,6 +658,76 @@ export const AGENCIES: Agency[] = [
     ]
   },
   {
+    id: 'nnpcl',
+    name: 'Nigerian National Petroleum Company Limited',
+    acronym: 'NNPCL',
+    head: 'Mele Kyari',
+    headTitle: 'Group Chief Executive Officer',
+    sector: 'Energy & Natural Resources',
+    category: 'economy',
+    logo: '/logos/nnpcl.svg',
+    trustIndex: 45.3,
+    change24h: -6.7,
+    change7d: -4.2,
+    ratingsCount: 31200,
+    metrics: {
+      transparency: 42.1,
+      effectiveness: 48.0,
+      integrity: 44.5,
+      publicPerception: 46.2
+    },
+    approval: { positive: 40, neutral: 22, negative: 38 },
+    sparkline: [52.0, 50.4, 49.0, 48.2, 47.0, 46.1, 45.3],
+    description: 'Commercial state oil company managing petroleum assets, crude supply to domestic refineries, and national energy security.',
+    recentReviews: [
+      {
+        id: 'n1',
+        author: 'Osato Igbinovia',
+        state: 'Edo State',
+        rating: 2,
+        comment: 'Crude supply to local refineries must be transparent. The fuel pricing adjustments need clearer communication to citizens.',
+        timeAgo: '7h ago',
+        isVerified: true,
+        upvotes: 210
+      }
+    ]
+  },
+  {
+    id: 'cbn',
+    name: 'Central Bank of Nigeria',
+    acronym: 'CBN',
+    head: 'Olayemi Cardoso',
+    headTitle: 'Governor',
+    sector: 'Monetary Policy & Financial Systems',
+    category: 'economy',
+    logo: '/logos/cbn.svg',
+    trustIndex: 56.4,
+    change24h: +3.1,
+    change7d: +5.4,
+    ratingsCount: 26800,
+    metrics: {
+      transparency: 68.0,
+      effectiveness: 60.5,
+      integrity: 64.0,
+      publicPerception: 56.4
+    },
+    approval: { positive: 55, neutral: 23, negative: 22 },
+    sparkline: [50.0, 51.5, 52.8, 54.0, 55.2, 55.9, 56.4],
+    description: 'Apex monetary authority regulating the banking sector, defending the external value of the Naira, and ensuring financial system stability.',
+    recentReviews: [
+      {
+        id: 'cbn1',
+        author: 'Femi Oladipo',
+        state: 'Lagos State',
+        rating: 4,
+        comment: 'FX backlog clearance and transparent willingness to maintain orthodox monetary policy is rebuilding foreign investor confidence.',
+        timeAgo: '5h ago',
+        isVerified: true,
+        upvotes: 135
+      }
+    ]
+  },
+  {
     id: 'nafdac',
     name: 'National Agency for Food & Drug Administration',
     acronym: 'NAFDAC',
@@ -614,7 +735,7 @@ export const AGENCIES: Agency[] = [
     headTitle: 'Director General',
     sector: 'Public Health & Product Safety',
     category: 'social',
-    logo: '💊',
+    logo: '/logos/nafdac.svg',
     trustIndex: 81.2,
     change24h: +3.2,
     change7d: +5.1,
@@ -649,7 +770,7 @@ export const AGENCIES: Agency[] = [
     headTitle: 'Executive Chairman',
     sector: 'Taxation & Fiscal Revenue',
     category: 'economy',
-    logo: '📊',
+    logo: '/logos/firs.svg',
     trustIndex: 79.5,
     change24h: +4.1,
     change7d: +6.3,
@@ -675,6 +796,41 @@ export const AGENCIES: Agency[] = [
         upvotes: 95
       }
     ]
+  },
+  {
+    id: 'jamb',
+    name: 'Joint Admissions & Matriculation Board',
+    acronym: 'JAMB',
+    head: 'Prof. Ishaq Oloyede',
+    headTitle: 'Registrar',
+    sector: 'Higher Education Admissions',
+    category: 'social',
+    logo: '/logos/jamb.png',
+    trustIndex: 84.1,
+    change24h: +3.8,
+    change7d: +5.0,
+    ratingsCount: 16200,
+    metrics: {
+      transparency: 88.0,
+      effectiveness: 86.5,
+      integrity: 89.0,
+      publicPerception: 84.1
+    },
+    approval: { positive: 82, neutral: 11, negative: 7 },
+    sparkline: [78.0, 79.2, 80.5, 81.8, 82.9, 83.5, 84.1],
+    description: 'Statutory examination body conducting unified tertiary matriculation examinations with computerized testing and fiscal remittances.',
+    recentReviews: [
+      {
+        id: 'j1',
+        author: 'Kabiru Sanusi',
+        state: 'Kano State',
+        rating: 5,
+        comment: 'Oloyede has turned JAMB into a shining beacon of operational discipline and examination transparency.',
+        timeAgo: '2d ago',
+        isVerified: true,
+        upvotes: 110
+      }
+    ]
   }
 ];
 
@@ -695,7 +851,7 @@ export const ELECTIONS: Election[] = [
         party: 'APGA',
         partyColor: '#EAB308',
         percentage: 45,
-        avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80',
+        avatar: '/avatars/soludo.jpg',
         status: 'Incumbent Governor'
       },
       {
@@ -703,7 +859,7 @@ export const ELECTIONS: Election[] = [
         party: 'APC',
         partyColor: '#10B981',
         percentage: 28,
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+        avatar: '/avatars/gbajabiamila.jpg',
         status: 'Challenger'
       },
       {
@@ -711,7 +867,7 @@ export const ELECTIONS: Election[] = [
         party: 'LP',
         partyColor: '#F97316',
         percentage: 19,
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+        avatar: '/avatars/peter-obi.jpg',
         status: 'Opposition Contender'
       },
       {
@@ -719,7 +875,7 @@ export const ELECTIONS: Election[] = [
         party: 'Others',
         partyColor: '#64748B',
         percentage: 8,
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+        avatar: '/logos/nigeria-coat-of-arms.svg',
         status: 'Coalition'
       }
     ],
@@ -741,7 +897,7 @@ export const ELECTIONS: Election[] = [
         party: 'APC',
         partyColor: '#10B981',
         percentage: 41.3,
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+        avatar: '/avatars/tinubu.jpg',
         status: 'Incumbent'
       },
       {
@@ -749,7 +905,7 @@ export const ELECTIONS: Election[] = [
         party: 'LP',
         partyColor: '#F97316',
         percentage: 31.7,
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+        avatar: '/avatars/peter-obi.jpg',
         status: 'Challenger'
       },
       {
@@ -757,7 +913,7 @@ export const ELECTIONS: Election[] = [
         party: 'PDP',
         partyColor: '#DC2626',
         percentage: 23.4,
-        avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80',
+        avatar: '/avatars/atiku.jpg',
         status: 'Challenger'
       },
       {
@@ -765,7 +921,7 @@ export const ELECTIONS: Election[] = [
         party: 'NNPP',
         partyColor: '#EF4444',
         percentage: 3.6,
-        avatar: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?auto=format&fit=crop&w=200&q=80',
+        avatar: '/avatars/kwankwaso.jpg',
         status: 'Challenger'
       }
     ],

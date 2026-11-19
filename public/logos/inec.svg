@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="inec-bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stopColor="#0B3B24" />
+      <stop offset="100%" stopColor="#021C10" />
+    </radialGradient>
+    <linearGradient id="inec-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#FBBF24" />
+      <stop offset="100%" stopColor="#D97706" />
+    </linearGradient>
+  </defs>
+  <!-- Base Disc -->
+  <circle cx="100" cy="100" r="94" fill="url(#inec-bg)" stroke="#10B981" stroke-width="4" />
+  <circle cx="100" cy="100" r="86" fill="none" stroke="#FBBF24" stroke-width="2" stroke-dasharray="3,3" />
+  
+  <!-- Outer Ring Text (Simulated arc style) -->
+  <path id="inec-arc" d="M 30,100 A 70,70 0 1,1 170,100" fill="none" />
+  <text font-family="'Outfit', sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="1.5">
+    <textPath href="#inec-arc" startOffset="50%" text-anchor="middle">
+      INDEPENDENT NATIONAL ELECTORAL COMMISSION
+    </textPath>
+  </text>
+  
+  <!-- Inner Shield / Ballot Box -->
+  <rect x="70" y="70" width="60" height="52" rx="6" fill="#047857" stroke="#FFFFFF" stroke-width="2.5" />
+  <!-- Ballot Slot -->
+  <rect x="82" y="78" width="36" height="5" rx="2.5" fill="#022C19" />
+  <!-- Paper Ballot entering slot -->
+  <path d="M 88 56 L 112 56 L 112 78 L 88 78 Z" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1.5" />
+  <path d="M 92 63 L 97 68 L 108 58" fill="none" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- INEC Acronym -->
+  <text x="100" y="108" font-family="'Outfit', sans-serif" font-size="18" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">
+    INEC
+  </text>
+  
+  <!-- Bottom Ribbon / Nigeria -->
+  <path d="M 50 148 Q 100 162 150 148 L 144 162 Q 100 174 56 162 Z" fill="url(#inec-gold)" />
+  <text x="100" y="160" font-family="'Outfit', sans-serif" font-size="10" font-weight="800" fill="#021C10" text-anchor="middle" letter-spacing="1">
+    NIGERIA
+  </text>
+</svg>

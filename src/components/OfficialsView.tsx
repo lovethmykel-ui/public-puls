@@ -211,8 +211,12 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-2xl">
-                          {agency.logo}
+                        <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.1] flex items-center justify-center overflow-hidden p-1.5 flex-shrink-0 shadow-sm">
+                          <img
+                            src={agency.logo}
+                            alt={agency.acronym}
+                            className="w-full h-full object-contain"
+                          />
                         </div>
 
                         <div>

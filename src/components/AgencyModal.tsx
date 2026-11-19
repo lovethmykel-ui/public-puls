@@ -94,8 +94,12 @@ export const AgencyModal: React.FC<AgencyModalProps> = ({
           <div className="overflow-y-auto px-5 py-4 space-y-5 no-scrollbar">
             {/* Header Card */}
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-3xl shadow-xl">
-                {agency.logo}
+              <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.1] flex items-center justify-center overflow-hidden p-2 shadow-xl flex-shrink-0">
+                <img
+                  src={agency.logo}
+                  alt={agency.acronym}
+                  className="w-full h-full object-contain"
+                />
               </div>
 
               <div>
