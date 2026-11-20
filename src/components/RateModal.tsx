@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
-import { 
-  X, 
-  Send, 
-  CheckCircle2,
-  Lock
-} from 'lucide-react';
+import { X, Send, CheckCircle2, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import type { AuditRatingInput } from '../utils/civicMath';
 import { triggerHaptic } from '../utils/telegram';
+
+export interface RateTarget {
+  id: string;
+  name: string;
+  role: string;
+  type: 'official' | 'agency';
+}
 
 interface RateModalProps {
   isOpen: boolean;
-  target: { name: string; role: string; type: 'official' | 'agency' } | null;
+  target: RateTarget | null;
   onClose: () => void;
-  onSubmitRating: (ratingData: any) => void;
+  onSubmitRating: (target: RateTarget, ratingData: AuditRatingInput) => void;
 }
 
 export const RateModal: React.FC<RateModalProps> = ({
@@ -51,18 +54,18 @@ export const RateModal: React.FC<RateModalProps> = ({
         colors: ['#00E676', '#10B981', '#38BDF8'],
       });
 
+      onSubmitRating(target, {
+        overallScore,
+        comment,
+        isAnonymous,
+      });
+
       setTimeout(() => {
         setIsSuccess(false);
-        onSubmitRating({
-          target: target.name,
-          overallScore,
-          scores: { economy, integrity, leadership, transparency },
-          comment,
-          isAnonymous,
-        });
+        setComment('');
         onClose();
-      }, 1500);
-    }, 700);
+      }, 1200);
+    }, 500);
   };
 
   return (
@@ -77,85 +80,86 @@ export const RateModal: React.FC<RateModalProps> = ({
           transition={{ type: 'spring', damping: 30, stiffness: 350 }}
           className="relative z-10 w-full max-w-md bg-[#0C0F17] border-t sm:border border-white/[0.12] sm:rounded-3xl rounded-t-3xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl"
         >
-          {/* Top Grab Bar */}
-          <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mt-2.5 mb-1 sm:hidden" />
+          <div className="w-10 h-1.5 bg-white/20 rounded-full mx-auto mt-2.5 mb-1 sm:hidden" />
 
-          {/* Modal Header */}
-          <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.08]">
-            <div>
-              <h3 className="text-sm font-bold text-white font-['Outfit']">
-                Rate {target.name}
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08]">
+            <div className="min-w-0">
+              <h3 className="text-sm font-bold text-white font-['Outfit'] truncate">
+                Audit {target.name}
               </h3>
-              <p className="text-[11px] text-slate-400">{target.role}</p>
+              <p className="text-xs text-slate-400 truncate">{target.role}</p>
             </div>
 
             <button
+              type="button"
               onClick={() => {
                 triggerHaptic('light');
                 onClose();
               }}
-              className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 hover:text-white"
+              aria-label="Close rating modal"
+              className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-slate-300 hover:text-white shrink-0"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Modal Body */}
           <div className="p-5 overflow-y-auto no-scrollbar space-y-5">
             {isSuccess ? (
               <div className="text-center py-8 space-y-3">
-                <div className="w-16 h-16 mx-auto rounded-full bg-emerald-500/20 border-2 border-[#00E676] flex items-center justify-center glow-emerald">
+                <div className="w-16 h-16 mx-auto rounded-full bg-emerald-500/20 border-2 border-[#00E676] flex items-center justify-center">
                   <CheckCircle2 className="w-8 h-8 text-[#00E676]" />
                 </div>
                 <h4 className="text-lg font-bold text-white font-['Outfit']">
-                  Audit Rating Recorded!
+                  Audit Rating Recorded
                 </h4>
                 <p className="text-xs text-slate-300 max-w-[260px] mx-auto">
-                  Your rating has been cryptographically signed and added to the public trust ledger.
+                  Your verified audit score has been applied to {target.name}&apos;s public trust index.
                 </p>
               </div>
             ) : (
               <>
-                {/* Overall Score Calculated Display */}
-                <div className="rounded-2xl glass-panel p-4 border border-white/[0.08] flex items-center justify-between">
+                <div className="surface-card rounded-2xl p-4 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] text-slate-400 uppercase font-semibold">
-                      Calculated Trust Index
-                    </span>
-                    <div className="text-3xl font-extrabold text-white font-mono mt-0.5">
+                    <span className="text-xs text-slate-400">Calculated Trust Index</span>
+                    <div className="text-3xl font-bold text-white font-mono tabular-nums mt-0.5">
                       {overallScore}%
                     </div>
                   </div>
-
-                  <div className="text-right">
-                    <span
-                      className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                        overallScore >= 70
-                          ? 'bg-emerald-500/15 text-[#00E676] border border-emerald-500/30'
-                          : overallScore >= 50
-                          ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                          : 'bg-red-500/15 text-red-400 border border-red-500/30'
-                      }`}
-                    >
-                      {overallScore >= 70 ? 'High Confidence' : overallScore >= 50 ? 'Moderate Confidence' : 'Low Confidence'}
-                    </span>
+                  <div
+                    className={`text-xs font-bold ${
+                      overallScore >= 70
+                        ? 'text-[#00E676]'
+                        : overallScore >= 50
+                        ? 'text-amber-400'
+                        : 'text-red-400'
+                    }`}
+                  >
+                    {overallScore >= 70
+                      ? 'High Confidence'
+                      : overallScore >= 50
+                      ? 'Moderate Confidence'
+                      : 'Low Confidence'}
                   </div>
                 </div>
 
-                {/* 4 Multi-Metric Sliders */}
                 <div className="space-y-4">
                   {[
-                    { label: 'Economic Impact & Fiscal Policy', val: economy, set: setEconomy },
-                    { label: 'Integrity, Transparency & Anti-Corruption', val: integrity, set: setIntegrity },
-                    { label: 'Decisiveness & Public Leadership', val: leadership, set: setLeadership },
-                    { label: 'Accessibility & Service Delivery', val: transparency, set: setTransparency },
-                  ].map((slider, idx) => (
-                    <div key={idx} className="space-y-1.5">
+                    { id: 'slider-econ', label: 'Economic Impact & Fiscal Policy', val: economy, set: setEconomy },
+                    { id: 'slider-integ', label: 'Integrity & Anti-Corruption', val: integrity, set: setIntegrity },
+                    { id: 'slider-lead', label: 'Decisiveness & Public Leadership', val: leadership, set: setLeadership },
+                    { id: 'slider-trans', label: 'Accessibility & Service Delivery', val: transparency, set: setTransparency },
+                  ].map((slider) => (
+                    <div key={slider.id} className="space-y-1.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-300 font-medium">{slider.label}</span>
-                        <span className="font-bold text-[#00E676] font-mono">{slider.val}%</span>
+                        <label htmlFor={slider.id} className="text-slate-300 font-medium">
+                          {slider.label}
+                        </label>
+                        <span className="font-bold text-[#00E676] font-mono tabular-nums">
+                          {slider.val}%
+                        </span>
                       </div>
                       <input
+                        id={slider.id}
                         type="range"
                         min="0"
                         max="100"
@@ -170,34 +174,40 @@ export const RateModal: React.FC<RateModalProps> = ({
                   ))}
                 </div>
 
-                {/* Comment Box */}
-                <div className="space-y-1.5 pt-1">
-                  <label className="text-[11px] font-semibold text-slate-300 block">
-                    Citizen Review & Justification (Optional)
+                <div className="space-y-1.5">
+                  <label htmlFor="audit-comment" className="text-xs font-semibold text-slate-300 block">
+                    Review &amp; Justification (Optional)
                   </label>
                   <textarea
+                    id="audit-comment"
                     rows={3}
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    placeholder="Provide specific feedback or community context for your rating..."
-                    className="w-full px-4 py-2.5 rounded-2xl glass-panel bg-white/[0.03] border border-white/[0.08] text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#00E676]"
+                    placeholder="Provide specific evidence or local context..."
+                    className="w-full px-4 py-2.5 rounded-2xl bg-[#12151E] border border-white/[0.1] text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#00E676]"
                   />
                 </div>
 
-                {/* Anonymous Cryptographic Toggle */}
-                <div className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-                  <div className="flex items-center gap-2">
+                <div className="surface-card rounded-2xl p-3.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
                     <Lock className="w-4 h-4 text-[#00E676]" />
                     <div>
-                      <span className="text-xs font-semibold text-white block">Anonymous ZK-Signature</span>
-                      <span className="text-[10px] text-slate-400">Zero link to your Telegram identity</span>
+                      <span className="text-xs font-semibold text-white block">
+                        Anonymous ZK-Signature
+                      </span>
+                      <span className="text-[11px] text-slate-400">
+                        Zero link to your Telegram identity
+                      </span>
                     </div>
                   </div>
-
                   <button
+                    type="button"
+                    role="switch"
+                    aria-checked={isAnonymous}
+                    aria-label="Anonymous ZK-Signature"
                     onClick={() => {
                       triggerHaptic('selection');
-                      setIsAnonymous(!isAnonymous);
+                      setIsAnonymous((v) => !v);
                     }}
                     className={`w-11 h-6 rounded-full transition-colors relative ${
                       isAnonymous ? 'bg-[#00E676]' : 'bg-slate-700'
@@ -214,22 +224,16 @@ export const RateModal: React.FC<RateModalProps> = ({
             )}
           </div>
 
-          {/* Submit Action */}
           {!isSuccess && (
-            <div className="p-4 border-t border-white/[0.08] bg-[#0C0F17]/90 backdrop-blur-xl">
+            <div className="p-4 border-t border-white/[0.08] bg-[#0C0F17]">
               <button
+                type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="w-full py-3.5 rounded-2xl bg-[#00E676] text-black font-bold text-sm tracking-wide shadow-xl shadow-[#00E676]/25 hover:bg-[#00c966] active:scale-98 transition-all flex items-center justify-center gap-2"
+                className="w-full min-h-[48px] py-3 rounded-2xl bg-[#00E676] hover:bg-[#00cf6a] text-black font-bold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
               >
-                {isSubmitting ? (
-                  <span>Recording Rating...</span>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4 text-black" />
-                    <span>Submit Verified Rating</span>
-                  </>
-                )}
+                <Send className="w-4 h-4" />
+                <span>{isSubmitting ? 'Recording Audit...' : 'Submit Verified Rating'}</span>
               </button>
             </div>
           )}

@@ -789,7 +789,6 @@ export const FORUM_POSTS: ForumPost[] = [
     id: 'post-1',
     author: 'Amina Yusuf',
     handle: '@amina_lagos',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
     isVerified: true,
     state: 'Lagos State',
     timestamp: '25m ago',
@@ -831,7 +830,6 @@ export const FORUM_POSTS: ForumPost[] = [
     id: 'post-2',
     author: 'Chinedu Okafor',
     handle: '@chinedu_aba',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
     isVerified: true,
     state: 'Abia State',
     timestamp: '1h ago',
@@ -894,7 +892,6 @@ export const FORUM_POSTS: ForumPost[] = [
     id: 'post-4',
     author: 'Danjuma Bako',
     handle: '@danjuma_kad',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
     isVerified: true,
     state: 'Kaduna State',
     timestamp: '3h ago',
@@ -915,7 +912,6 @@ export const FORUM_POSTS: ForumPost[] = [
     id: 'post-5',
     author: 'Kemi Adeleke',
     handle: '@kemi_adeleke',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80',
     isVerified: true,
     state: 'Oyo State',
     timestamp: '5h ago',
@@ -935,52 +931,6 @@ export const FORUM_POSTS: ForumPost[] = [
 ];
 
 export const ELECTIONS: Election[] = [
-  {
-    id: 'anambra-2025',
-    title: 'Anambra Governorship Election',
-    type: 'governorship',
-    dateStr: 'November 8, 2025',
-    targetDate: '2025-11-08T08:00:00Z',
-    location: 'Anambra State (21 LGAs)',
-    status: 'upcoming',
-    leadingCandidate: 'Prof. Chukwuma Soludo',
-    confidence: 84,
-    candidates: [
-      {
-        name: 'Chukwuma Soludo',
-        party: 'APGA',
-        partyColor: '#EAB308',
-        percentage: 45,
-        avatar: '/avatars/soludo.jpg',
-        status: 'Incumbent Governor'
-      },
-      {
-        name: 'Paul Chukwuma',
-        party: 'APC',
-        partyColor: '#10B981',
-        percentage: 28,
-        avatar: '/avatars/gbajabiamila.jpg',
-        status: 'Challenger'
-      },
-      {
-        name: 'Valentine Ozigbo / LP',
-        party: 'LP',
-        partyColor: '#F97316',
-        percentage: 19,
-        avatar: '/avatars/peter-obi.jpg',
-        status: 'Opposition Contender'
-      },
-      {
-        name: 'Other Candidates',
-        party: 'Others',
-        partyColor: '#64748B',
-        percentage: 8,
-        avatar: '/logos/nigeria-coat-of-arms.svg',
-        status: 'Coalition'
-      }
-    ],
-    overview: 'High-stakes off-cycle governorship race in the South East commercial hub. Soludo defends his record of infrastructure and education reforms against formidable APC and Labour Party mobilization.'
-  },
   {
     id: 'general-2027',
     title: '2027 Presidential General Election',
@@ -1026,6 +976,128 @@ export const ELECTIONS: Election[] = [
       }
     ],
     overview: 'National civic consensus forecast compiled from over 418,000 verified citizen polling entries across 774 Local Government Areas.'
+  },
+  {
+    id: 'anambra-2025',
+    title: 'Anambra Governorship Election (Certified)',
+    type: 'governorship',
+    dateStr: 'November 8, 2025',
+    targetDate: '2025-11-08T08:00:00Z',
+    location: 'Anambra State (21 LGAs)',
+    status: 'past',
+    leadingCandidate: 'Prof. Chukwuma Soludo',
+    confidence: 94,
+    candidates: [
+      {
+        name: 'Chukwuma Soludo',
+        party: 'APGA',
+        partyColor: '#EAB308',
+        percentage: 49.2,
+        avatar: '/avatars/soludo.jpg',
+        status: 'Re-elected Governor'
+      },
+      {
+        name: 'Paul Chukwuma',
+        party: 'APC',
+        partyColor: '#10B981',
+        percentage: 26.8,
+        avatar: '/avatars/gbajabiamila.jpg',
+        status: 'Runner-Up'
+      },
+      {
+        name: 'Valentine Ozigbo / LP',
+        party: 'LP',
+        partyColor: '#F97316',
+        percentage: 17.5,
+        avatar: '/avatars/peter-obi.jpg',
+        status: 'Contender'
+      },
+      {
+        name: 'Other Candidates',
+        party: 'Others',
+        partyColor: '#64748B',
+        percentage: 6.5,
+        avatar: '/logos/nigeria-coat-of-arms.svg',
+        status: 'Coalition'
+      }
+    ],
+    overview: 'Certified off-cycle governorship race in the South East commercial hub, tracked across all 21 LGAs.'
+  },
+  {
+    id: 'cvr-ongoing-2026',
+    title: 'Continuous Voter Registration & Bye-Elections',
+    type: 'senatorial',
+    dateStr: 'Active Through Dec 2026',
+    targetDate: '2026-12-20T08:00:00Z',
+    location: '36 States + FCT (INEC Portals)',
+    status: 'ongoing',
+    leadingCandidate: 'Youth & Diaspora Turnout',
+    confidence: 76,
+    candidates: [
+      {
+        name: 'New Youth Registrations (18–34)',
+        party: 'CVR',
+        partyColor: '#00E676',
+        percentage: 61.4,
+        avatar: '/logos/inec.svg',
+        status: '2.1M Verified Entries'
+      },
+      {
+        name: 'PVC Transfers & Corrections',
+        party: 'INEC',
+        partyColor: '#3B82F6',
+        percentage: 27.2,
+        avatar: '/logos/inec.svg',
+        status: '930K Processed'
+      },
+      {
+        name: 'Pending Biometric Capture',
+        party: 'Queue',
+        partyColor: '#F59E0B',
+        percentage: 11.4,
+        avatar: '/logos/nigeria-coat-of-arms.svg',
+        status: 'In Review'
+      }
+    ],
+    overview: 'Live tracking of ongoing INEC Continuous Voter Registration (CVR) turnout, ward-level PVC collection, and legislative bye-election monitoring.'
+  },
+  {
+    id: 'ondo-2024-past',
+    title: 'Ondo State Governorship Election (Certified)',
+    type: 'governorship',
+    dateStr: 'November 16, 2024',
+    targetDate: '2024-11-16T08:00:00Z',
+    location: 'Ondo State (18 LGAs)',
+    status: 'past',
+    leadingCandidate: 'Lucky Aiyedatiwa',
+    confidence: 96,
+    candidates: [
+      {
+        name: 'Lucky Aiyedatiwa',
+        party: 'APC',
+        partyColor: '#10B981',
+        percentage: 72.4,
+        avatar: '/avatars/tunji-ojo.jpg',
+        status: 'Certified Winner'
+      },
+      {
+        name: 'Agboola Ajayi',
+        party: 'PDP',
+        partyColor: '#DC2626',
+        percentage: 22.8,
+        avatar: '/avatars/atiku.jpg',
+        status: 'Runner-Up'
+      },
+      {
+        name: 'Other Parties',
+        party: 'Others',
+        partyColor: '#64748B',
+        percentage: 4.8,
+        avatar: '/logos/nigeria-coat-of-arms.svg',
+        status: 'Coalition'
+      }
+    ],
+    overview: 'Final certified off-cycle governorship results compared against PublicPulse citizen exit polls (94.2% forecast accuracy across 18 LGAs).'
   }
 ];
 

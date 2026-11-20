@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import amaraAvatar from '../assets/images/citizen_amara_1795210837859.jpg';
 import { triggerHaptic } from '../utils/telegram';
 
 interface VerificationModalProps {
@@ -85,20 +86,19 @@ export const VerificationModal: React.FC<VerificationModalProps> = ({
           <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mt-2.5 mb-1 sm:hidden" />
 
           {/* Modal Header */}
-          <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.08]">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#00E676] animate-pulse" />
-              <span className="text-xs font-bold text-white uppercase tracking-wider font-['Outfit']">
-                Step {step} of 5: {step === 1 ? 'Verify Phone' : step === 2 ? 'Verify NIN' : step === 3 ? 'Face Verification' : step === 4 ? 'Select Constituency' : 'Verification Complete!'}
-              </span>
-            </div>
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08]">
+            <span className="text-xs font-bold text-white uppercase tracking-wider font-['Outfit']">
+              Step {step} of 5 · {step === 1 ? 'Verify Phone' : step === 2 ? 'Verify NIN' : step === 3 ? 'Face Verification' : step === 4 ? 'Select Constituency' : 'Complete'}
+            </span>
 
             <button
+              type="button"
               onClick={() => {
                 triggerHaptic('light');
                 onClose();
               }}
-              className="w-8 h-8 rounded-full bg-white/[0.05] flex items-center justify-center text-slate-300 hover:text-white"
+              aria-label="Close verification modal"
+              className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-slate-300 hover:text-white"
             >
               <X className="w-4 h-4" />
             </button>
@@ -189,8 +189,9 @@ export const VerificationModal: React.FC<VerificationModalProps> = ({
               <div className="text-center space-y-4">
                 <div className="relative w-32 h-32 mx-auto rounded-full p-1 border-2 border-dashed border-[#00E676]/60 flex items-center justify-center overflow-hidden">
                   <img
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
-                    alt="Face scan"
+                    src={amaraAvatar}
+                    alt="Citizen face liveness preview"
+                    referrerPolicy="no-referrer"
                     className="w-full h-full rounded-full object-cover"
                   />
                   {isScanning && (

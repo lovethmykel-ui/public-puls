@@ -1,414 +1,441 @@
 import React, { useState } from 'react';
-import { 
-  Search, 
-  ShieldCheck, 
-  Star, 
-  Building2,
-  ArrowUpRight, 
+import {
+  Search,
+  ShieldCheck,
+  ArrowUpRight,
   ArrowDownRight,
   ArrowBigUp,
-  ArrowBigDown
+  ArrowBigDown,
+  X,
+  Trophy,
 } from 'lucide-react';
-import { OFFICIALS, AGENCIES } from '../data/mockData';
 import type { Official, Agency } from '../types';
+import { filterAgencies, filterOfficials, type OfficialFilter } from '../utils/civicMath';
 import { triggerHaptic } from '../utils/telegram';
 
 interface OfficialsViewProps {
+  officials: Official[];
+  agencies: Agency[];
+  onVoteOfficial: (officialId: string, direction: 'up' | 'down') => void;
+  onVoteAgency: (agencyId: string, direction: 'up' | 'down') => void;
   onSelectOfficial: (official: Official) => void;
   onSelectAgency: (agency: Agency) => void;
   onOpenRateModal: (target: { name: string; role: string; type: 'official' | 'agency' }) => void;
 }
 
+type LeaderboardSegment = 'officials' | 'agencies' | 'all';
+
 export const OfficialsView: React.FC<OfficialsViewProps> = ({
+  officials,
+  agencies,
+  onVoteOfficial,
+  onVoteAgency,
   onSelectOfficial,
   onSelectAgency,
   onOpenRateModal,
 }) => {
-  const [officialsList, setOfficialsList] = useState<Official[]>(OFFICIALS);
-  const [agenciesList, setAgenciesList] = useState<Agency[]>(AGENCIES);
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'executive' | 'governors' | 'ministers' | 'agencies'>('all');
+  const [segment, setSegment] = useState<LeaderboardSegment>('all');
+  const [categoryFilter, setCategoryFilter] = useState<OfficialFilter>('all');
+  const [sortBy, setSortBy] = useState<'score' | 'movers'>('score');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleOfficialVote = (e: React.MouseEvent, officialId: string, direction: 'up' | 'down') => {
-    e.stopPropagation();
-    triggerHaptic('medium');
-    setOfficialsList((prev) =>
-      prev.map((off) => {
-        if (off.id !== officialId) return off;
+  const effectiveOfficialFilter: OfficialFilter =
+    segment === 'agencies' ? 'agencies' : categoryFilter;
 
-        const currentVote = off.userVote;
-        let upvotes = off.upvotesCount || 100;
-        let downvotes = off.downvotesCount || 20;
-        let newVote: 'up' | 'down' | null = direction;
+  const filteredOfficials = filterOfficials(officials, effectiveOfficialFilter, searchQuery).sort(
+    (a, b) => (sortBy === 'movers' ? b.change24h - a.change24h : b.trustIndex - a.trustIndex)
+  );
 
-        if (currentVote === direction) {
-          newVote = null;
-          if (direction === 'up') upvotes = Math.max(0, upvotes - 1);
-          else downvotes = Math.max(0, downvotes - 1);
-        } else {
-          if (currentVote === 'up') upvotes = Math.max(0, upvotes - 1);
-          if (currentVote === 'down') downvotes = Math.max(0, downvotes - 1);
-          if (direction === 'up') upvotes += 1;
-          else downvotes += 1;
-        }
+  const showAgencies = segment === 'all' || segment === 'agencies';
+  const filteredAgencies = showAgencies
+    ? filterAgencies(agencies, searchQuery).sort((a, b) =>
+        sortBy === 'movers' ? b.change24h - a.change24h : b.trustIndex - a.trustIndex
+      )
+    : [];
 
-        const totalVotes = upvotes + downvotes;
-        const newTrust = totalVotes > 0 ? (upvotes / totalVotes) * 100 : off.trustIndex;
+  // Unified ranked list for Podium + Leaderboard
+  type RankedItem =
+    | { kind: 'official'; item: Official; score: number; change: number }
+    | { kind: 'agency'; item: Agency; score: number; change: number };
 
-        return {
-          ...off,
-          userVote: newVote,
-          upvotesCount: upvotes,
-          downvotesCount: downvotes,
-          trustIndex: Number(newTrust.toFixed(1)),
-        };
-      })
+  const unifiedRanked: RankedItem[] = [
+    ...filteredOfficials.map((o) => ({
+      kind: 'official' as const,
+      item: o,
+      score: o.trustIndex,
+      change: o.change24h,
+    })),
+    ...filteredAgencies.map((a) => ({
+      kind: 'agency' as const,
+      item: a,
+      score: a.trustIndex,
+      change: a.change24h,
+    })),
+  ].sort((a, b) => (sortBy === 'movers' ? b.change - a.change : b.score - a.score));
+
+  const showPodium = searchQuery.trim() === '' && unifiedRanked.length >= 3;
+  const podiumTop3 = showPodium ? unifiedRanked.slice(0, 3) : [];
+  const listEntries = showPodium ? unifiedRanked.slice(3) : unifiedRanked;
+
+  const avgTrust =
+    unifiedRanked.length > 0
+      ? (unifiedRanked.reduce((acc, r) => acc + r.score, 0) / unifiedRanked.length).toFixed(1)
+      : '0.0';
+
+  const renderPodiumCard = (entry: RankedItem, rank: 1 | 2 | 3) => {
+    const isOfficial = entry.kind === 'official';
+    const name = isOfficial ? entry.item.name : entry.item.acronym;
+    const sub = isOfficial ? entry.item.party : entry.item.sector.split('&')[0].trim();
+    const imgSrc = isOfficial ? entry.item.avatar : entry.item.logo;
+
+    const badgeColor =
+      rank === 1
+        ? 'bg-amber-400 text-black'
+        : rank === 2
+        ? 'bg-slate-300 text-black'
+        : 'bg-amber-700 text-white';
+
+    return (
+      <button
+        key={`${entry.kind}-${entry.item.id}`}
+        type="button"
+        onClick={() => {
+          triggerHaptic('light');
+          if (isOfficial) onSelectOfficial(entry.item);
+          else onSelectAgency(entry.item);
+        }}
+        className={`flex flex-col items-center text-center group focus-visible:outline-none ${
+          rank === 1 ? '-mt-4' : 'mt-2'
+        }`}
+      >
+        <div className="relative mb-2">
+          <div
+            className={`rounded-full overflow-hidden flex items-center justify-center ring-2 transition-transform group-hover:scale-105 ${
+              rank === 1
+                ? 'w-20 h-20 sm:w-24 sm:h-24 ring-[#00E676]/70'
+                : 'w-16 h-16 sm:w-20 sm:h-20 ring-white/15'
+            } ${!isOfficial ? 'bg-white p-2' : 'bg-[#151A25]'}`}
+          >
+            <img
+              src={imgSrc}
+              alt={name}
+              referrerPolicy="no-referrer"
+              className={`w-full h-full ${isOfficial ? 'object-cover' : 'object-contain'}`}
+            />
+          </div>
+          <span
+            className={`absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono tabular-nums shadow-md ${badgeColor}`}
+          >
+            #{rank}
+          </span>
+        </div>
+
+        <span className="text-xs sm:text-sm font-bold text-white mt-2 line-clamp-1 max-w-[110px] sm:max-w-[140px]">
+          {name}
+        </span>
+        <span className="text-[11px] text-slate-400 truncate max-w-[110px]">{sub}</span>
+        <span className="mt-1 text-xs font-bold font-mono tabular-nums text-[#00E676]">
+          {entry.score.toFixed(1)}/100
+        </span>
+      </button>
     );
   };
-
-  const handleAgencyVote = (e: React.MouseEvent, agencyId: string, direction: 'up' | 'down') => {
-    e.stopPropagation();
-    triggerHaptic('medium');
-    setAgenciesList((prev) =>
-      prev.map((ag) => {
-        if (ag.id !== agencyId) return ag;
-
-        const currentVote = ag.userVote;
-        let upvotes = ag.upvotesCount || 80;
-        let downvotes = ag.downvotesCount || 20;
-        let newVote: 'up' | 'down' | null = direction;
-
-        if (currentVote === direction) {
-          newVote = null;
-          if (direction === 'up') upvotes = Math.max(0, upvotes - 1);
-          else downvotes = Math.max(0, downvotes - 1);
-        } else {
-          if (currentVote === 'up') upvotes = Math.max(0, upvotes - 1);
-          if (currentVote === 'down') downvotes = Math.max(0, downvotes - 1);
-          if (direction === 'up') upvotes += 1;
-          else downvotes += 1;
-        }
-
-        const totalVotes = upvotes + downvotes;
-        const newTrust = totalVotes > 0 ? (upvotes / totalVotes) * 100 : ag.trustIndex;
-
-        return {
-          ...ag,
-          userVote: newVote,
-          upvotesCount: upvotes,
-          downvotesCount: downvotes,
-          trustIndex: Number(newTrust.toFixed(1)),
-        };
-      })
-    );
-  };
-
-  const filteredOfficials = officialsList.filter((official) => {
-    if (selectedFilter === 'executive' && official.category !== 'executive') return false;
-    if (selectedFilter === 'governors' && official.category !== 'governor') return false;
-    if (selectedFilter === 'ministers' && official.category !== 'minister') return false;
-    if (selectedFilter === 'agencies') return false;
-
-    if (searchQuery.trim().length > 0) {
-      const q = searchQuery.toLowerCase();
-      return (
-        official.name.toLowerCase().includes(q) ||
-        official.role.toLowerCase().includes(q) ||
-        official.state.toLowerCase().includes(q) ||
-        official.party.toLowerCase().includes(q)
-      );
-    }
-    return true;
-  });
-
-  const showAgencies = selectedFilter === 'all' || selectedFilter === 'agencies';
-  const filteredAgencies = agenciesList.filter((agency) => {
-    if (searchQuery.trim().length > 0) {
-      const q = searchQuery.toLowerCase();
-      return (
-        agency.name.toLowerCase().includes(q) ||
-        agency.acronym.toLowerCase().includes(q) ||
-        agency.sector.toLowerCase().includes(q) ||
-        agency.head.toLowerCase().includes(q)
-      );
-    }
-    return true;
-  });
 
   return (
-    <div className="space-y-4 px-4 pb-28">
-      {/* Header */}
-      <div className="pt-1">
-        <h2 className="text-xl font-bold tracking-tight text-white font-['Outfit']">
-          Officials & Institutions Directory
-        </h2>
-        <p className="text-xs text-slate-400">Public servants, cabinet ministers & state agencies (1 - 100 Index)</p>
+    <div className="px-4 sm:px-6 pt-4 pb-28 md:pb-12 space-y-5">
+      {/* Centered Hero Title matching fomo Leaderboard */}
+      <div className="text-center space-y-1 pt-1">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-['Outfit']">
+          Accountability Index
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-400">
+          Live citizen rankings for elected officials &amp; federal institutions
+        </p>
       </div>
 
-      {/* Search Input */}
-      <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search by name, state, ministry, or agency..."
-          className="w-full pl-10 pr-4 py-2.5 rounded-2xl glass-panel bg-white/[0.03] border border-white/[0.08] text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#00E676]/50 transition-colors"
-        />
+      {/* Full-Width 3-Tab Underline Navigation (fomo pattern) */}
+      <div className="grid grid-cols-3 border-b border-white/[0.08]">
+        {(
+          [
+            { id: 'all', label: 'All Ranked' },
+            { id: 'officials', label: 'Officials' },
+            { id: 'agencies', label: 'Agencies' },
+          ] as const
+        ).map((tab) => {
+          const isActive = segment === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => {
+                triggerHaptic('selection');
+                setSegment(tab.id);
+                if (tab.id === 'agencies') setCategoryFilter('all');
+              }}
+              className={`relative min-h-[44px] py-2.5 text-sm font-semibold transition-colors whitespace-nowrap ${
+                isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {tab.label}
+              {isActive && (
+                <span className="absolute inset-x-4 bottom-0 h-0.5 bg-[#00E676] rounded-full" />
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Filter Category Pills */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-        {(['all', 'executive', 'governors', 'ministers', 'agencies'] as const).map((filter) => (
+      {/* Search + Filters Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search official, state, ministry, or agency..."
+            aria-label="Search officials and agencies"
+            className="w-full min-h-[44px] pl-10 pr-9 py-2 rounded-xl bg-[#12151E] border border-white/[0.08] text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#00E676]/60 transition-colors"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-white"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          {segment !== 'agencies' && (
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/[0.06] overflow-x-auto no-scrollbar max-w-full">
+              {(['all', 'executive', 'governors', 'ministers'] as const).map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('selection');
+                    setCategoryFilter(f);
+                  }}
+                  className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold capitalize whitespace-nowrap transition-colors ${
+                    categoryFilter === f
+                      ? 'bg-white/[0.12] text-white'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+          )}
+
           <button
-            key={filter}
+            type="button"
             onClick={() => {
               triggerHaptic('selection');
-              setSelectedFilter(filter);
+              setSortBy((prev) => (prev === 'score' ? 'movers' : 'score'));
             }}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold capitalize whitespace-nowrap transition-all ${
-              selectedFilter === filter
-                ? 'bg-[#00E676] text-black shadow-lg shadow-[#00E676]/20 font-bold'
-                : 'bg-white/[0.05] text-slate-400 hover:text-white border border-white/[0.06]'
-            }`}
+            className="min-h-[38px] px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.09] border border-white/[0.08] text-xs font-semibold text-slate-200 whitespace-nowrap shrink-0 ml-auto"
           >
-            {filter}
+            Sort: {sortBy === 'score' ? 'Score' : '24h'}
           </button>
-        ))}
+        </div>
       </div>
 
-      {/* Officials List */}
-      <div className="space-y-2.5">
-        {selectedFilter !== 'agencies' && (
-          <>
-            {filteredOfficials.map((official) => {
-              const isPositive = official.change24h >= 0;
+      {/* Top 3 Podium Showcase (DOGS NFT Leaderboard Pattern) */}
+      {showPodium && (
+        <section
+          aria-label="Top 3 ranked leaders"
+          className="relative rounded-3xl surface-card pt-8 pb-6 px-4 overflow-hidden"
+        >
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-32 bg-[radial-gradient(ellipse_at_top,rgba(0,230,118,0.14),transparent_70%)] pointer-events-none"
+          />
+          <div className="relative z-10 grid grid-cols-3 gap-2 items-end max-w-lg mx-auto">
+            {renderPodiumCard(podiumTop3[1], 2)}
+            {renderPodiumCard(podiumTop3[0], 1)}
+            {renderPodiumCard(podiumTop3[2], 3)}
+          </div>
+        </section>
+      )}
 
-              return (
-                <div
-                  key={official.id}
-                  onClick={() => {
-                    triggerHaptic('light');
-                    onSelectOfficial(official);
-                  }}
-                  className="glass-card-interactive rounded-2xl p-4 cursor-pointer"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <img
-                          src={official.avatar}
-                          alt={official.name}
-                          className="w-12 h-12 rounded-full object-cover ring-2 ring-white/10"
-                        />
-                        <span
-                          className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded text-[8px] font-bold text-white uppercase"
-                          style={{ backgroundColor: official.partyColor }}
-                        >
-                          {official.party}
-                        </span>
-                      </div>
-
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <h4 className="text-sm font-bold text-white tracking-tight">{official.name}</h4>
-                          <ShieldCheck className="w-3.5 h-3.5 text-[#00E676]" />
-                        </div>
-                        <p className="text-xs text-slate-400 mt-0.5">{official.role}</p>
-                        <div className="flex items-center gap-2 mt-1.5 text-[11px] text-slate-400">
-                          <span>{official.state}</span>
-                          <span>•</span>
-                          <span className="flex items-center gap-0.5 text-amber-400 font-medium">
-                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                            {official.trustIndex >= 70 ? '4.8' : official.trustIndex >= 60 ? '4.2' : '3.6'}
-                          </span>
-                          <span className="text-[10px] text-slate-400">({official.ratingsCount.toLocaleString()})</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="text-right flex flex-col items-end">
-                      <div className="text-base font-extrabold text-white font-mono">
-                        {official.trustIndex.toFixed(1)}
-                        <span className="text-[10px] text-slate-400 font-normal">/100</span>
-                      </div>
-                      <div
-                        className={`text-[10px] font-semibold flex items-center justify-end gap-0.5 mt-0.5 ${
-                          isPositive ? 'text-[#00E676]' : 'text-red-400'
-                        }`}
-                      >
-                        {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                        <span>{isPositive ? `+${official.change24h}%` : `${official.change24h}%`}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* One-Tap Uprate/Downrate & Rate Modal Action Strip */}
-                  <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-white/[0.06]">
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={(e) => handleOfficialVote(e, official.id, 'up')}
-                        className={`px-2.5 py-1 rounded-xl border text-xs font-semibold flex items-center gap-1 transition-all active:scale-95 ${
-                          official.userVote === 'up'
-                            ? 'bg-emerald-500/25 border-[#00E676] text-[#00E676] shadow-sm'
-                            : 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:text-white hover:bg-emerald-500/10'
-                        }`}
-                        title="Uprate official"
-                      >
-                        <ArrowBigUp className={`w-3.5 h-3.5 ${official.userVote === 'up' ? 'fill-[#00E676]' : ''}`} />
-                        <span>{(official.upvotesCount || 1420).toLocaleString()}</span>
-                      </button>
-
-                      <button
-                        onClick={(e) => handleOfficialVote(e, official.id, 'down')}
-                        className={`px-2.5 py-1 rounded-xl border text-xs font-semibold flex items-center gap-1 transition-all active:scale-95 ${
-                          official.userVote === 'down'
-                            ? 'bg-red-500/25 border-red-500 text-red-400 shadow-sm'
-                            : 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:text-white hover:bg-red-500/10'
-                        }`}
-                        title="Downrate official"
-                      >
-                        <ArrowBigDown className={`w-3.5 h-3.5 ${official.userVote === 'down' ? 'fill-red-400' : ''}`} />
-                        <span>{(official.downvotesCount || 340).toLocaleString()}</span>
-                      </button>
-                    </div>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        triggerHaptic('medium');
-                        onOpenRateModal({
-                          name: official.name,
-                          role: official.role,
-                          type: 'official',
-                        });
-                      }}
-                      className="px-3 py-1 rounded-xl bg-white/[0.06] hover:bg-emerald-500/20 text-[#00E676] hover:text-emerald-300 border border-white/[0.08] text-xs font-semibold active:scale-95 transition-all"
-                    >
-                      Audit & Review
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </>
-        )}
-
-        {/* Agencies Section */}
-        {showAgencies && filteredAgencies.length > 0 && (
-          <div className="pt-3">
-            {selectedFilter === 'all' && (
-              <div className="flex items-center gap-1.5 mb-2.5">
-                <Building2 className="w-4 h-4 text-blue-400" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-['Outfit']">
-                  Federal Agencies & Commissions
-                </h3>
-              </div>
-            )}
-
-            <div className="space-y-2.5">
-              {filteredAgencies.map((agency) => {
-                const isPositive = agency.change24h >= 0;
-
-                return (
-                  <div
-                    key={agency.id}
-                    onClick={() => {
-                      triggerHaptic('light');
-                      onSelectAgency(agency);
-                    }}
-                    className="glass-card-interactive rounded-2xl p-4 cursor-pointer"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.1] flex items-center justify-center overflow-hidden p-1.5 flex-shrink-0 shadow-sm">
-                          <img
-                            src={agency.logo}
-                            alt={agency.acronym}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <h4 className="text-sm font-bold text-white tracking-tight">{agency.acronym}</h4>
-                            <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-blue-500/15 text-blue-400">
-                              Agency
-                            </span>
-                          </div>
-                          <p className="text-xs text-slate-400 mt-0.5 truncate max-w-[170px]">{agency.name}</p>
-                          <p className="text-[11px] text-slate-400 mt-1">Head: {agency.head}</p>
-                        </div>
-                      </div>
-
-                      <div className="text-right flex flex-col items-end">
-                        <div className="text-base font-extrabold text-white font-mono">
-                          {agency.trustIndex.toFixed(1)}
-                          <span className="text-[10px] text-slate-400 font-normal">/100</span>
-                        </div>
-                        <div
-                          className={`text-[10px] font-semibold flex items-center justify-end gap-0.5 mt-0.5 ${
-                            isPositive ? 'text-[#00E676]' : 'text-red-400'
-                          }`}
-                        >
-                          {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                          <span>{isPositive ? `+${agency.change24h}%` : `${agency.change24h}%`}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Agency One-Tap Uprate/Downrate & Rate Modal */}
-                    <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-white/[0.06]">
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={(e) => handleAgencyVote(e, agency.id, 'up')}
-                          className={`px-2.5 py-1 rounded-xl border text-xs font-semibold flex items-center gap-1 transition-all active:scale-95 ${
-                            agency.userVote === 'up'
-                              ? 'bg-blue-500/25 border-blue-400 text-blue-400 shadow-sm'
-                              : 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:text-white hover:bg-blue-500/10'
-                          }`}
-                          title="Uprate agency"
-                        >
-                          <ArrowBigUp className={`w-3.5 h-3.5 ${agency.userVote === 'up' ? 'fill-blue-400' : ''}`} />
-                          <span>{(agency.upvotesCount || 890).toLocaleString()}</span>
-                        </button>
-
-                        <button
-                          onClick={(e) => handleAgencyVote(e, agency.id, 'down')}
-                          className={`px-2.5 py-1 rounded-xl border text-xs font-semibold flex items-center gap-1 transition-all active:scale-95 ${
-                            agency.userVote === 'down'
-                              ? 'bg-red-500/25 border-red-500 text-red-400 shadow-sm'
-                              : 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:text-white hover:bg-red-500/10'
-                          }`}
-                          title="Downrate agency"
-                        >
-                          <ArrowBigDown className={`w-3.5 h-3.5 ${agency.userVote === 'down' ? 'fill-red-400' : ''}`} />
-                          <span>{(agency.downvotesCount || 190).toLocaleString()}</span>
-                        </button>
-                      </div>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          triggerHaptic('medium');
-                          onOpenRateModal({
-                            name: agency.name,
-                            role: agency.headTitle,
-                            type: 'agency',
-                          });
-                        }}
-                        className="px-3 py-1 rounded-xl bg-white/[0.06] hover:bg-blue-500/20 text-blue-400 hover:text-blue-300 border border-white/[0.08] text-xs font-semibold active:scale-95 transition-all"
-                      >
-                        Audit & Review
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+      {/* Summary Benchmark Card (fomo "Your rank" strip) */}
+      <div className="surface-card rounded-2xl px-4 py-3.5 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#00E676]/15 text-[#00E676] flex items-center justify-center shrink-0">
+            <Trophy className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xs text-slate-400">Filtered Cohort Average</div>
+            <div className="text-sm font-bold text-white font-['Outfit'] tabular-nums">
+              {unifiedRanked.length} Tracked Entities
             </div>
           </div>
-        )}
+        </div>
+        <div className="text-right">
+          <div className="text-lg font-bold text-[#00E676] font-mono tabular-nums">
+            {avgTrust}/100
+          </div>
+          <div className="text-[11px] text-slate-400">Citizen Consensus</div>
+        </div>
       </div>
+
+      {/* Ranked Rows (fomo clean borderless hairline list) */}
+      {unifiedRanked.length === 0 ? (
+        <div className="surface-card rounded-2xl p-8 text-center space-y-2">
+          <p className="text-sm font-semibold text-white">No matching officials or agencies</p>
+          <p className="text-xs text-slate-400">
+            Try clearing your search query or switching category tabs.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setSearchQuery('');
+              setCategoryFilter('all');
+              setSegment('all');
+            }}
+            className="mt-2 px-4 py-2 rounded-xl bg-white/[0.08] text-xs font-semibold text-white hover:bg-white/[0.12]"
+          >
+            Reset Filters
+          </button>
+        </div>
+      ) : (
+        <div className="divide-y divide-white/[0.06] border-y border-white/[0.06]">
+          {listEntries.map((entry, idx) => {
+            const rank = showPodium ? idx + 4 : idx + 1;
+            const isOfficial = entry.kind === 'official';
+            const isPositive = entry.change >= 0;
+            const name = isOfficial ? entry.item.name : entry.item.acronym;
+            const subtitle = isOfficial
+              ? `${entry.item.role} · ${entry.item.state}`
+              : `${entry.item.name} · ${entry.item.head}`;
+            const imgSrc = isOfficial ? entry.item.avatar : entry.item.logo;
+
+            return (
+              <div
+                key={`${entry.kind}-${entry.item.id}`}
+                className="py-3.5 flex items-center justify-between gap-3"
+              >
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <span className="w-6 text-xs font-mono font-semibold text-slate-500 tabular-nums shrink-0">
+                    {rank}.
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('light');
+                      if (isOfficial) onSelectOfficial(entry.item);
+                      else onSelectAgency(entry.item);
+                    }}
+                    className="flex items-center gap-3 min-w-0 flex-1 text-left group min-h-[44px]"
+                  >
+                    <div
+                      className={`w-11 h-11 overflow-hidden shrink-0 ring-1 ring-white/15 ${
+                        !isOfficial ? 'bg-white p-1.5 rounded-xl' : 'rounded-full'
+                      }`}
+                    >
+                      <img
+                        src={imgSrc}
+                        alt={name}
+                        referrerPolicy="no-referrer"
+                        className={`w-full h-full ${isOfficial ? 'object-cover' : 'object-contain'}`}
+                      />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-semibold text-white truncate group-hover:text-[#00E676] transition-colors">
+                          {name}
+                        </span>
+                        {isOfficial && (
+                          <ShieldCheck className="w-3.5 h-3.5 text-[#00E676] shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-400 truncate mt-0.5">{subtitle}</p>
+                    </div>
+                  </button>
+                </div>
+
+                {/* Right: Compact Actions + Score */}
+                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('medium');
+                      onOpenRateModal(
+                        isOfficial
+                          ? { name: entry.item.name, role: entry.item.role, type: 'official' }
+                          : { name: entry.item.name, role: entry.item.headTitle, type: 'agency' }
+                      );
+                    }}
+                    className="hidden sm:inline-flex min-h-[34px] items-center px-3 py-1 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-xs font-semibold text-slate-200 transition-colors"
+                  >
+                    Audit
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        triggerHaptic('medium');
+                        if (isOfficial) onVoteOfficial(entry.item.id, 'up');
+                        else onVoteAgency(entry.item.id, 'up');
+                      }}
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors active:scale-95 ${
+                        entry.item.userVote === 'up'
+                          ? 'bg-[#00E676] text-black'
+                          : 'bg-white/[0.05] text-slate-400 hover:text-[#00E676] hover:bg-white/[0.1]'
+                      }`}
+                      aria-label={`Uprate ${name}`}
+                    >
+                      <ArrowBigUp className="w-4 h-4 fill-current" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        triggerHaptic('medium');
+                        if (isOfficial) onVoteOfficial(entry.item.id, 'down');
+                        else onVoteAgency(entry.item.id, 'down');
+                      }}
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors active:scale-95 ${
+                        entry.item.userVote === 'down'
+                          ? 'bg-red-500 text-white'
+                          : 'bg-white/[0.05] text-slate-400 hover:text-red-400 hover:bg-white/[0.1]'
+                      }`}
+                      aria-label={`Downrate ${name}`}
+                    >
+                      <ArrowBigDown className="w-4 h-4 fill-current" />
+                    </button>
+                  </div>
+
+                  <div className="text-right min-w-[58px]">
+                    <div className="text-sm font-bold text-white font-mono tabular-nums">
+                      {entry.score.toFixed(1)}
+                    </div>
+                    <div
+                      className={`text-[11px] font-semibold font-mono tabular-nums flex items-center justify-end gap-0.5 ${
+                        isPositive ? 'text-[#00E676]' : 'text-red-400'
+                      }`}
+                    >
+                      {isPositive ? (
+                        <ArrowUpRight className="w-3 h-3" />
+                      ) : (
+                        <ArrowDownRight className="w-3 h-3" />
+                      )}
+                      <span>{isPositive ? `+${entry.change}%` : `${entry.change}%`}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

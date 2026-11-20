@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { NavTab, Official, Agency } from './types';
+import { Bell, X, Check } from 'lucide-react';
+import type { NavTab, Official, Agency, ForumPost, ForumReply } from './types';
+import { OFFICIALS, AGENCIES, FORUM_POSTS } from './data/mockData';
+import {
+  applyAuditRating,
+  applyEntityVote,
+  type AuditRatingInput,
+} from './utils/civicMath';
 import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
 import { HomeView } from './components/HomeView';
@@ -11,29 +18,141 @@ import { ProfileView } from './components/ProfileView';
 import { PoliticianModal } from './components/PoliticianModal';
 import { AgencyModal } from './components/AgencyModal';
 import { VerificationModal } from './components/VerificationModal';
-import { RateModal } from './components/RateModal';
+import { RateModal, type RateTarget } from './components/RateModal';
 import { DeviceFrame } from './components/DeviceFrame';
 import { initTelegramApp } from './utils/telegram';
 
+interface NotificationItem {
+  id: string;
+  title: string;
+  detail: string;
+  time: string;
+  unread: boolean;
+}
+
+const INITIAL_NOTIFICATIONS: NotificationItem[] = [
+  {
+    id: 'n1',
+    title: 'EFCC Trust Index surged +12.4%',
+    detail: 'Institutional enforcement rating reached 87.6/100 across 22.4K audits.',
+    time: '18m ago',
+    unread: true,
+  },
+  {
+    id: 'n2',
+    title: 'Anambra 2025 Polling Update',
+    detail: 'Confidence model updated with 1,420 new verified citizen entries.',
+    time: '2h ago',
+    unread: true,
+  },
+  {
+    id: 'n3',
+    title: 'Zero-Knowledge Credential Active',
+    detail: 'Your 100% voting weight is verified for Lagos State · Ikeja Ward 05.',
+    time: '1d ago',
+    unread: true,
+  },
+];
+
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavTab>('home');
-  const [selectedOfficial, setSelectedOfficial] = useState<Official | null>(null);
-  const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
+  const [officials, setOfficials] = useState<Official[]>(OFFICIALS);
+  const [agencies, setAgencies] = useState<Agency[]>(AGENCIES);
+  const [posts, setPosts] = useState<ForumPost[]>(FORUM_POSTS);
+  const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+  const [selectedOfficialId, setSelectedOfficialId] = useState<string | null>(null);
+  const [selectedAgencyId, setSelectedAgencyId] = useState<string | null>(null);
   const [isVerificationOpen, setIsVerificationOpen] = useState(false);
-  const [rateTarget, setRateTarget] = useState<{
-    name: string;
-    role: string;
-    type: 'official' | 'agency';
-  } | null>(null);
+  const [rateTarget, setRateTarget] = useState<RateTarget | null>(null);
   const [isVerified, setIsVerified] = useState(true);
 
   useEffect(() => {
     initTelegramApp();
   }, []);
 
+  const selectedOfficial = officials.find((o) => o.id === selectedOfficialId) || null;
+  const selectedAgency = agencies.find((a) => a.id === selectedAgencyId) || null;
+  const unreadCount = notifications.filter((n) => n.unread).length;
+
+  const handleVoteOfficial = (officialId: string, direction: 'up' | 'down') => {
+    setOfficials((prev) =>
+      prev.map((o) => (o.id === officialId ? applyEntityVote(o, direction) : o))
+    );
+  };
+
+  const handleVoteAgency = (agencyId: string, direction: 'up' | 'down') => {
+    setAgencies((prev) =>
+      prev.map((a) => (a.id === agencyId ? applyEntityVote(a, direction) : a))
+    );
+  };
+
+  const handleVotePost = (postId: string, direction: 'up' | 'down') => {
+    setPosts((prev) =>
+      prev.map((p) => {
+        if (p.id !== postId) return p;
+        if (p.userVote === direction) {
+          return {
+            ...p,
+            userVote: undefined,
+            upvotes: direction === 'up' ? p.upvotes - 1 : p.upvotes,
+            downvotes: direction === 'down' ? p.downvotes - 1 : p.downvotes,
+          };
+        }
+        const wasUp = p.userVote === 'up';
+        const wasDown = p.userVote === 'down';
+        return {
+          ...p,
+          userVote: direction,
+          upvotes: direction === 'up' ? p.upvotes + 1 : wasUp ? p.upvotes - 1 : p.upvotes,
+          downvotes: direction === 'down' ? p.downvotes + 1 : wasDown ? p.downvotes - 1 : p.downvotes,
+        };
+      })
+    );
+  };
+
+  const handleCreatePost = (newPost: ForumPost) => {
+    setPosts((prev) => [newPost, ...prev]);
+  };
+
+  const handleAddReply = (postId: string, reply: ForumReply) => {
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? {
+              ...p,
+              repliesCount: p.repliesCount + 1,
+              replies: [...p.replies, reply],
+            }
+          : p
+      )
+    );
+  };
+
+  const handleToggleBookmark = (id: string) => {
+    setBookmarkedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleSubmitAuditRating = (target: RateTarget, data: AuditRatingInput) => {
+    if (target.type === 'official') {
+      setOfficials((prev) =>
+        prev.map((o) => (o.id === target.id ? applyAuditRating(o, data) : o))
+      );
+    } else {
+      setAgencies((prev) =>
+        prev.map((a) => (a.id === target.id ? applyAuditRating(a, data) : a))
+      );
+    }
+  };
+
   const handleRateOfficial = (official: Official) => {
-    setSelectedOfficial(null);
+    setSelectedOfficialId(null);
     setRateTarget({
+      id: official.id,
       name: official.name,
       role: official.role,
       type: 'official',
@@ -41,8 +160,9 @@ export const App: React.FC = () => {
   };
 
   const handleRateAgency = (agency: Agency) => {
-    setSelectedAgency(null);
+    setSelectedAgencyId(null);
     setRateTarget({
+      id: agency.id,
       name: agency.name,
       role: agency.headTitle,
       type: 'agency',
@@ -50,55 +170,85 @@ export const App: React.FC = () => {
   };
 
   return (
-    <DeviceFrame>
-      <div className="flex-1 flex flex-col relative w-full overflow-x-hidden min-h-full">
-        {/* Top App Header */}
+    <DeviceFrame activeTab={activeTab}>
+      <div className="flex-1 flex flex-col relative w-full min-h-full">
         <Header
-          userName="Amara"
+          activeTab={activeTab}
+          onChangeTab={(tab) => {
+            setActiveTab(tab);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
           isVerified={isVerified}
+          unreadCount={unreadCount}
           onOpenVerification={() => setIsVerificationOpen(true)}
-          onOpenNotifications={() => {}}
+          onOpenNotifications={() => setIsNotificationsOpen(true)}
         />
 
-        {/* Tab View Content Container with Spring Transitions */}
         <main className="flex-1 w-full relative">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
               className="w-full"
             >
               {activeTab === 'home' && (
                 <HomeView
-                  onSelectOfficial={(official) => setSelectedOfficial(official)}
+                  officials={officials}
+                  onVoteOfficial={handleVoteOfficial}
+                  onSelectOfficial={(official) => setSelectedOfficialId(official.id)}
                   onNavigateTab={(tab) => setActiveTab(tab)}
                   onOpenVerification={() => setIsVerificationOpen(true)}
                 />
               )}
 
-              {activeTab === 'forum' && <ForumView />}
+              {activeTab === 'forum' && (
+                <ForumView
+                  posts={posts}
+                  onVotePost={handleVotePost}
+                  onCreatePost={handleCreatePost}
+                  onAddReply={handleAddReply}
+                />
+              )}
 
               {activeTab === 'officials' && (
                 <OfficialsView
-                  onSelectOfficial={(official) => setSelectedOfficial(official)}
-                  onSelectAgency={(agency) => setSelectedAgency(agency)}
-                  onOpenRateModal={(target) => setRateTarget(target)}
+                  officials={officials}
+                  agencies={agencies}
+                  onVoteOfficial={handleVoteOfficial}
+                  onVoteAgency={handleVoteAgency}
+                  onSelectOfficial={(official) => setSelectedOfficialId(official.id)}
+                  onSelectAgency={(agency) => setSelectedAgencyId(agency.id)}
+                  onOpenRateModal={(target) => {
+                    const matchedOff = officials.find((o) => o.name === target.name);
+                    const matchedAg = agencies.find((a) => a.name === target.name);
+                    setRateTarget({
+                      id: matchedOff?.id || matchedAg?.id || '',
+                      ...target,
+                    });
+                  }}
                 />
               )}
 
               {activeTab === 'elections' && <ElectionsView />}
 
               {activeTab === 'profile' && (
-                <ProfileView onOpenVerification={() => setIsVerificationOpen(true)} />
+                <ProfileView
+                  isVerified={isVerified}
+                  officials={officials}
+                  agencies={agencies}
+                  bookmarkedIds={bookmarkedIds}
+                  onOpenVerification={() => setIsVerificationOpen(true)}
+                  onSelectOfficial={(official) => setSelectedOfficialId(official.id)}
+                  onSelectAgency={(agency) => setSelectedAgencyId(agency.id)}
+                />
               )}
             </motion.div>
           </AnimatePresence>
         </main>
 
-        {/* Floating Apple-grade Bottom Navigation */}
         <Navigation
           activeTab={activeTab}
           onChangeTab={(tab) => {
@@ -107,16 +257,21 @@ export const App: React.FC = () => {
           }}
         />
 
-        {/* Modals & Bottom Sheets */}
+        {/* Entity & Action Modals */}
         <PoliticianModal
           official={selectedOfficial}
-          onClose={() => setSelectedOfficial(null)}
+          isBookmarked={selectedOfficial ? bookmarkedIds.includes(selectedOfficial.id) : false}
+          onToggleBookmark={handleToggleBookmark}
+          onVote={handleVoteOfficial}
+          onClose={() => setSelectedOfficialId(null)}
           onRate={handleRateOfficial}
         />
 
         <AgencyModal
           agency={selectedAgency}
-          onClose={() => setSelectedAgency(null)}
+          isBookmarked={selectedAgency ? bookmarkedIds.includes(selectedAgency.id) : false}
+          onToggleBookmark={handleToggleBookmark}
+          onClose={() => setSelectedAgencyId(null)}
           onRate={handleRateAgency}
         />
 
@@ -130,8 +285,87 @@ export const App: React.FC = () => {
           isOpen={rateTarget !== null}
           target={rateTarget}
           onClose={() => setRateTarget(null)}
-          onSubmitRating={() => {}}
+          onSubmitRating={handleSubmitAuditRating}
         />
+
+        {/* Notifications Drawer */}
+        <AnimatePresence>
+          {isNotificationsOpen && (
+            <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md">
+              <div
+                className="absolute inset-0"
+                onClick={() => setIsNotificationsOpen(false)}
+              />
+              <motion.div
+                initial={{ y: '100%', opacity: 0.8 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: '100%', opacity: 0 }}
+                transition={{ type: 'spring', damping: 30, stiffness: 350 }}
+                className="relative z-10 w-full max-w-md bg-[#0C0F17] border-t sm:border border-white/[0.12] sm:rounded-3xl rounded-t-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl"
+              >
+                <div className="w-10 h-1.5 bg-white/20 rounded-full mx-auto mt-2.5 mb-1 sm:hidden" />
+
+                <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08]">
+                  <div className="flex items-center gap-2">
+                    <Bell className="w-4 h-4 text-[#00E676]" />
+                    <h3 className="text-sm font-bold text-white font-['Outfit']">
+                      Civic Alerts
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {unreadCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })))
+                        }
+                        className="text-xs font-semibold text-[#00E676] hover:underline flex items-center gap-1"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Mark all read</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setIsNotificationsOpen(false)}
+                      aria-label="Close notifications"
+                      className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-slate-300 hover:text-white"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="divide-y divide-white/[0.06] overflow-y-auto no-scrollbar">
+                  {notifications.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() =>
+                        setNotifications((prev) =>
+                          prev.map((n) => (n.id === item.id ? { ...n, unread: false } : n))
+                        )
+                      }
+                      className="w-full px-5 py-4 text-left hover:bg-white/[0.03] transition-colors flex items-start justify-between gap-3"
+                    >
+                      <div className="space-y-1">
+                        <div className="text-sm font-semibold text-white">{item.title}</div>
+                        <p className="text-xs text-slate-400 leading-relaxed">{item.detail}</p>
+                        <span className="text-[11px] text-slate-500 block">{item.time}</span>
+                      </div>
+                      {item.unread && (
+                        <span
+                          aria-label="Unread"
+                          className="w-2 h-2 rounded-full bg-[#00E676] mt-1.5 shrink-0"
+                        />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </DeviceFrame>
   );
