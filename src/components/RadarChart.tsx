@@ -18,7 +18,7 @@ interface RadarChartProps {
 export const RadarChart: React.FC<RadarChartProps> = ({
   data,
   size = 240,
-  color = '#E2E8F0',
+  color = '#E5E5E5',
 }) => {
   const axes = [
     { key: 'economy', label: 'Economy', val: data.economy },
@@ -120,7 +120,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
               cy={p.y}
               r={3.5}
               fill={color}
-              stroke="#08090C"
+              stroke="#0C0C0C"
               strokeWidth={1.5}
             />
           </g>
@@ -137,10 +137,10 @@ export const RadarChart: React.FC<RadarChartProps> = ({
               y={labelPoint.y}
               textAnchor="middle"
               dominantBaseline="middle"
-              className="text-[11px] font-medium fill-slate-400"
+              className="text-[11px] font-medium fill-neutral-400"
             >
               {axis.label}
-              <tspan className="text-[10px] font-semibold fill-slate-100 ml-1">
+              <tspan className="text-[10px] font-semibold fill-neutral-100 ml-1">
                 {` ${Math.round(axis.val)}%`}
               </tspan>
             </text>

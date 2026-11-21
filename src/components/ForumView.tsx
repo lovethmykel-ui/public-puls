@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   MessageSquare,
   ArrowBigUp,
@@ -15,6 +15,7 @@ import {
   Check,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button, SegmentedControl, Switch } from 'glisse';
 import { OFFICIALS, AGENCIES, AI_DAILY_BRIEF } from '../data/mockData';
 import type { ForumPost, ForumReply } from '../types';
 import { filterForumPosts, type ForumFeedFilter } from '../utils/civicMath';
@@ -26,6 +27,13 @@ interface ForumViewProps {
   onCreatePost: (post: ForumPost) => void;
   onAddReply: (postId: string, reply: ForumReply) => void;
 }
+
+const FEED_TABS = [
+  { value: 'trending', label: 'Trending' },
+  { value: 'latest', label: 'Latest' },
+  { value: 'uprated', label: 'Uprated' },
+  { value: 'downrated', label: 'Downrated' },
+];
 
 const TOPICS = [
   { id: 'all', label: 'All Topics' },
@@ -59,6 +67,18 @@ export const ForumView: React.FC<ForumViewProps> = ({
   // Threaded replies modal state
   const [activeThreadPostId, setActiveThreadPostId] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
+
+  useEffect(() => {
+    if (!isComposeOpen && !activeThreadPostId) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsComposeOpen(false);
+        setActiveThreadPostId(null);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isComposeOpen, activeThreadPostId]);
 
   const activeThreadPost = posts.find((p) => p.id === activeThreadPostId) || null;
   const filteredPosts = filterForumPosts(posts, activeFilter, searchTag);
@@ -166,47 +186,37 @@ export const ForumView: React.FC<ForumViewProps> = ({
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white font-['Outfit']">
             The People&apos;s Voice
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-xs sm:text-sm text-neutral-400">
             Uncensored civic ledger · Zero-Knowledge signed
           </p>
         </div>
 
-        <button
+        <Button
           type="button"
+          variant="filled"
+          icon={<Plus className="w-4 h-4 stroke-[2.5]" />}
           onClick={() => {
             triggerHaptic('medium');
             setIsComposeOpen(true);
           }}
-          className="min-h-[40px] px-4 py-2 rounded-full bg-white hover:bg-slate-200 text-black text-xs font-bold active:scale-95 transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0"
+          className="!h-10 !px-4 !text-xs shrink-0"
         >
-          <Plus className="w-4 h-4 stroke-[2.5]" />
-          <span>Speak Up</span>
-        </button>
+          Speak Up
+        </Button>
       </div>
 
-      {/* Full-Width Underline Feed Tabs */}
-      <div className="grid grid-cols-4 border-b border-white/[0.08]">
-        {(['trending', 'latest', 'uprated', 'downrated'] as const).map((tab) => {
-          const isActive = activeFilter === tab;
-          return (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => {
-                triggerHaptic('selection');
-                setActiveFilter(tab);
-              }}
-              className={`relative min-h-[44px] py-2.5 text-xs sm:text-sm font-semibold capitalize transition-colors whitespace-nowrap ${
-                isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              {tab}
-              {isActive && (
-                <span className="absolute inset-x-3 bottom-0 h-0.5 bg-white rounded-full" />
-              )}
-            </button>
-          );
-        })}
+      {/* Liquid Glass Feed Segmented Control */}
+      <div className="overflow-x-auto no-scrollbar">
+        <SegmentedControl
+          aria-label="Forum feed filter"
+          items={FEED_TABS}
+          value={activeFilter}
+          onValueChange={(value) => {
+            triggerHaptic('selection');
+            setActiveFilter(value as ForumFeedFilter);
+          }}
+          className="lg-segmented-4"
+        />
       </div>
 
       {/* Topic Filters */}
@@ -222,7 +232,7 @@ export const ForumView: React.FC<ForumViewProps> = ({
             className={`min-h-[34px] px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
               searchTag === topic.id
                 ? 'bg-white text-black'
-                : 'bg-white/[0.05] text-slate-400 hover:text-white'
+                : 'bg-white/[0.05] text-neutral-400 hover:text-white'
             }`}
           >
             {topic.label}
@@ -230,16 +240,16 @@ export const ForumView: React.FC<ForumViewProps> = ({
         ))}
       </div>
 
-      {/* Pinned Recap Card (fomo IMG_6339 exact structure) */}
+      {/* Pinned Recap Card */}
       <div className="pt-1">
-        <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+        <div className="flex items-center justify-between text-xs text-neutral-400 mb-2">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-white">PublicPulse</span>
-            <ShieldCheck className="w-3.5 h-3.5 text-slate-200" />
+            <ShieldCheck className="w-3.5 h-3.5 text-[#E5E5E5]" />
             <span>· {AI_DAILY_BRIEF.date}</span>
           </div>
-          <span className="flex items-center gap-1 text-slate-400">
-            <Pin className="w-3 h-3 text-slate-200" />
+          <span className="flex items-center gap-1 text-neutral-400">
+            <Pin className="w-3 h-3 text-[#E5E5E5]" />
             <span>Pinned</span>
           </span>
         </div>
@@ -248,13 +258,13 @@ export const ForumView: React.FC<ForumViewProps> = ({
           <h2 className="text-sm font-bold text-white font-['Outfit']">
             Recap: {AI_DAILY_BRIEF.title}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+          <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed">
             · {AI_DAILY_BRIEF.summary}
           </p>
           {briefExpanded && (
             <ul className="space-y-1.5 pt-2 border-t border-white/[0.06]">
               {AI_DAILY_BRIEF.bulletPoints.map((b, i) => (
-                <li key={i} className="text-xs text-slate-400 leading-relaxed">
+                <li key={i} className="text-xs text-neutral-400 leading-relaxed">
                   · {b}
                 </li>
               ))}
@@ -263,27 +273,30 @@ export const ForumView: React.FC<ForumViewProps> = ({
           <button
             type="button"
             onClick={() => setBriefExpanded((v) => !v)}
-            className="text-xs font-semibold text-slate-200 hover:text-white hover:underline pt-0.5"
+            className="text-xs font-semibold text-neutral-200 hover:text-white hover:underline pt-0.5"
           >
             {briefExpanded ? 'Show less' : 'Read more'}
           </button>
         </div>
       </div>
 
-      {/* Clean Hairline-Separated Feed List (fomo style) */}
+      {/* Clean Hairline-Separated Feed List */}
       {filteredPosts.length === 0 ? (
-        <div className="surface-card rounded-2xl p-8 text-center space-y-2">
+        <div className="surface-card rounded-2xl p-8 text-center space-y-3">
           <p className="text-sm font-semibold text-white">No posts match this filter</p>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveFilter('trending');
-              setSearchTag('all');
-            }}
-            className="px-4 py-2 rounded-xl bg-white/[0.08] text-xs font-semibold text-white hover:bg-white/[0.12]"
-          >
-            Show All Posts
-          </button>
+          <div className="flex justify-center">
+            <Button
+              type="button"
+              variant="glass"
+              onClick={() => {
+                setActiveFilter('trending');
+                setSearchTag('all');
+              }}
+              className="!h-9 !px-4 !text-xs"
+            >
+              Show All Posts
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="divide-y divide-white/[0.06] border-t border-white/[0.06]">
@@ -296,7 +309,7 @@ export const ForumView: React.FC<ForumViewProps> = ({
                 {/* Author Line */}
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-[#161A25] border border-white/[0.1] flex items-center justify-center text-xs font-bold text-slate-200 shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-[#1A1A1A] border border-white/[0.1] flex items-center justify-center text-xs font-bold text-neutral-200 shrink-0">
                       {getInitials(post.author)}
                     </div>
 
@@ -304,11 +317,11 @@ export const ForumView: React.FC<ForumViewProps> = ({
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="text-sm font-bold text-white">{post.author}</span>
                         {post.isVerified && (
-                          <ShieldCheck className="w-3.5 h-3.5 text-slate-200 shrink-0" />
+                          <ShieldCheck className="w-3.5 h-3.5 text-[#E5E5E5] shrink-0" />
                         )}
-                        <span className="text-xs text-slate-400 font-mono">{post.handle}</span>
+                        <span className="text-xs text-neutral-400 font-mono">{post.handle}</span>
                       </div>
-                      <div className="text-xs text-slate-400">
+                      <div className="text-xs text-neutral-400">
                         {post.state} · {post.timestamp}
                       </div>
                     </div>
@@ -319,12 +332,12 @@ export const ForumView: React.FC<ForumViewProps> = ({
                 {post.taggedEntity && (
                   <div className="pl-[52px]">
                     <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold border ${
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
                         post.taggedEntity.voteAction === 'uprated'
                           ? 'bg-white/[0.1] border-white/[0.16] text-white'
                           : post.taggedEntity.voteAction === 'downrated'
-                          ? 'bg-white/[0.04] border-white/[0.08] text-slate-300'
-                          : 'bg-white/[0.06] border-white/[0.1] text-slate-200'
+                          ? 'bg-white/[0.04] border-white/[0.08] text-neutral-300'
+                          : 'bg-white/[0.06] border-white/[0.1] text-neutral-200'
                       }`}
                     >
                       {post.taggedEntity.voteAction === 'uprated'
@@ -338,16 +351,16 @@ export const ForumView: React.FC<ForumViewProps> = ({
                 )}
 
                 {/* Body Content */}
-                <p className="pl-[52px] text-sm text-slate-200 leading-relaxed">{post.content}</p>
+                <p className="pl-[52px] text-sm text-neutral-200 leading-relaxed">{post.content}</p>
 
                 {/* Clean Action Bar */}
-                <div className="pl-[52px] flex items-center justify-between pt-1 text-xs text-slate-400">
+                <div className="pl-[52px] flex items-center justify-between pt-1 text-xs text-neutral-400">
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
                       onClick={() => onVotePost(post.id, 'up')}
                       aria-pressed={post.userVote === 'up'}
-                      className={`min-h-[36px] px-2.5 rounded-lg flex items-center gap-1 transition-colors border ${
+                      className={`min-h-[36px] px-2.5 rounded-full flex items-center gap-1 transition-colors border ${
                         post.userVote === 'up'
                           ? 'bg-white/[0.14] border-white/25 text-white font-bold'
                           : 'border-transparent hover:bg-white/[0.05] hover:text-white'
@@ -355,7 +368,7 @@ export const ForumView: React.FC<ForumViewProps> = ({
                       aria-label={`Uprate post by ${post.author}`}
                     >
                       <ArrowBigUp
-                        className={`w-4 h-4 text-slate-200 ${post.userVote === 'up' ? 'fill-slate-200' : ''}`}
+                        className={`w-4 h-4 text-[#E5E5E5] ${post.userVote === 'up' ? 'fill-[#E5E5E5]' : ''}`}
                       />
                       <span className="font-mono tabular-nums">{post.upvotes}</span>
                     </button>
@@ -364,15 +377,15 @@ export const ForumView: React.FC<ForumViewProps> = ({
                       type="button"
                       onClick={() => onVotePost(post.id, 'down')}
                       aria-pressed={post.userVote === 'down'}
-                      className={`min-h-[36px] px-2 rounded-lg flex items-center gap-1 transition-colors border ${
+                      className={`min-h-[36px] px-2 rounded-full flex items-center gap-1 transition-colors border ${
                         post.userVote === 'down'
-                          ? 'bg-white/[0.1] border-white/20 text-white font-bold'
+                          ? 'bg-white/[0.12] border-white/25 text-white font-bold'
                           : 'border-transparent hover:bg-white/[0.05] hover:text-white'
                       }`}
                       aria-label={`Downrate post by ${post.author}`}
                     >
                       <ArrowBigDown
-                        className={`w-4 h-4 text-slate-200 ${post.userVote === 'down' ? 'fill-slate-200' : ''}`}
+                        className={`w-4 h-4 text-[#E5E5E5] ${post.userVote === 'down' ? 'fill-[#E5E5E5]' : ''}`}
                       />
                       {post.downvotes > 0 && (
                         <span className="font-mono tabular-nums">{post.downvotes}</span>
@@ -385,10 +398,10 @@ export const ForumView: React.FC<ForumViewProps> = ({
                         triggerHaptic('light');
                         setActiveThreadPostId(post.id);
                       }}
-                      className="min-h-[36px] px-2.5 rounded-lg flex items-center gap-1.5 hover:bg-white/[0.05] hover:text-white transition-colors"
+                      className="min-h-[36px] px-2.5 rounded-full flex items-center gap-1.5 hover:bg-white/[0.05] hover:text-white transition-colors"
                       aria-label={`Open ${post.repliesCount} replies`}
                     >
-                      <MessageSquare className="w-4 h-4 text-slate-200" />
+                      <MessageSquare className="w-4 h-4 text-[#E5E5E5]" />
                       <span className="font-mono tabular-nums">{post.repliesCount}</span>
                     </button>
                   </div>
@@ -397,13 +410,13 @@ export const ForumView: React.FC<ForumViewProps> = ({
                     <button
                       type="button"
                       onClick={() => handleSharePost(post)}
-                      className="min-h-[36px] px-2.5 rounded-lg flex items-center gap-1 hover:bg-white/[0.05] hover:text-white transition-colors"
+                      className="min-h-[36px] px-2.5 rounded-full flex items-center gap-1 hover:bg-white/[0.05] hover:text-white transition-colors"
                       aria-label="Share post"
                     >
                       {isCopied ? (
-                        <Check className="w-4 h-4 text-slate-200" />
+                        <Check className="w-4 h-4 text-[#E5E5E5]" />
                       ) : (
-                        <Share2 className="w-4 h-4 text-slate-200" />
+                        <Share2 className="w-4 h-4 text-[#E5E5E5]" />
                       )}
                       <span className="font-mono tabular-nums">
                         {isCopied ? 'Copied' : post.sharesCount}
@@ -417,14 +430,16 @@ export const ForumView: React.FC<ForumViewProps> = ({
                         setBookmarkedIds((prev) => ({ ...prev, [post.id]: !prev[post.id] }));
                       }}
                       aria-pressed={isSaved}
-                      className={`min-h-[36px] min-w-[36px] rounded-lg flex items-center justify-center transition-colors border ${
+                      className={`min-h-[36px] min-w-[36px] rounded-full flex items-center justify-center transition-colors border ${
                         isSaved
                           ? 'bg-white/[0.12] border-white/25'
                           : 'border-transparent hover:bg-white/[0.05]'
                       }`}
                       aria-label={isSaved ? 'Remove bookmark' : 'Bookmark post'}
                     >
-                      <Bookmark className={`w-4 h-4 text-slate-200 ${isSaved ? 'fill-slate-200' : ''}`} />
+                      <Bookmark
+                        className={`w-4 h-4 text-[#E5E5E5] ${isSaved ? 'fill-[#E5E5E5]' : ''}`}
+                      />
                     </button>
                   </div>
                 </div>
@@ -441,53 +456,59 @@ export const ForumView: React.FC<ForumViewProps> = ({
             <div className="absolute inset-0" onClick={() => setIsComposeOpen(false)} />
 
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="compose-modal-title"
               initial={{ y: '100%', opacity: 0.8 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}
               transition={{ type: 'spring', damping: 30, stiffness: 350 }}
-              className="relative z-10 w-full max-w-md bg-[#0C0F17] border-t sm:border border-white/[0.12] sm:rounded-3xl rounded-t-3xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl"
+              className="relative z-10 w-full max-w-md glass-sheet border-t sm:border border-white/[0.12] sm:rounded-3xl rounded-t-3xl max-h-[92vh] flex flex-col overflow-hidden"
             >
               <div className="w-10 h-1.5 bg-white/20 rounded-full mx-auto mt-2.5 mb-1 sm:hidden" />
 
               <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08]">
-                <h3 className="text-sm font-bold text-white font-['Outfit']">
+                <h3
+                  id="compose-modal-title"
+                  className="text-sm font-bold text-white font-['Outfit']"
+                >
                   Publish Civic Statement
                 </h3>
-                <button
+                <Button
                   type="button"
+                  variant="glass"
+                  icon={<X className="w-4 h-4" />}
                   onClick={() => setIsComposeOpen(false)}
                   aria-label="Close composer"
-                  className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-slate-300 hover:text-white"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                  className="!h-9 !w-9"
+                />
               </div>
 
               <form onSubmit={handleSubmitPost} className="p-5 space-y-4 overflow-y-auto no-scrollbar">
                 <div className="space-y-1.5">
                   <label
                     htmlFor="tag-entity-select"
-                    className="text-xs font-semibold text-slate-300 flex items-center gap-1.5"
+                    className="text-xs font-semibold text-neutral-300 flex items-center gap-1.5"
                   >
-                    <AtSign className="w-3.5 h-3.5 text-slate-200" />
+                    <AtSign className="w-3.5 h-3.5 text-[#E5E5E5]" />
                     <span>Tag Official or Agency</span>
                   </label>
                   <select
                     id="tag-entity-select"
                     value={selectedEntityId}
                     onChange={(e) => setSelectedEntityId(e.target.value)}
-                    className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl bg-[#12151E] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-white/40"
+                    className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl bg-[#141414] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-white/40"
                   >
                     <optgroup label="Public Officials">
                       {OFFICIALS.map((o) => (
-                        <option key={o.id} value={o.id} className="bg-[#0C0F17]">
+                        <option key={o.id} value={o.id} className="bg-[#141414]">
                           {o.name} ({o.role})
                         </option>
                       ))}
                     </optgroup>
                     <optgroup label="Agencies & Commissions">
                       {AGENCIES.map((a) => (
-                        <option key={a.id} value={a.id} className="bg-[#0C0F17]">
+                        <option key={a.id} value={a.id} className="bg-[#141414]">
                           {a.acronym} — {a.name}
                         </option>
                       ))}
@@ -502,13 +523,13 @@ export const ForumView: React.FC<ForumViewProps> = ({
                       triggerHaptic('selection');
                       setVoteAction('uprated');
                     }}
-                    className={`min-h-[44px] py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors border ${
+                    className={`min-h-[44px] py-2 rounded-full text-xs font-bold flex items-center justify-center gap-1.5 transition-colors border ${
                       voteAction === 'uprated'
                         ? 'bg-white/[0.14] text-white border-white/30'
-                        : 'bg-white/[0.04] text-slate-400 hover:text-white border-white/[0.06]'
+                        : 'bg-white/[0.04] text-neutral-400 hover:text-white border-white/[0.06]'
                     }`}
                   >
-                    <ArrowBigUp className="w-4 h-4 text-slate-200 fill-slate-200" />
+                    <ArrowBigUp className="w-4 h-4 text-[#E5E5E5] fill-[#E5E5E5]" />
                     <span>Uprate (+1)</span>
                   </button>
 
@@ -518,13 +539,13 @@ export const ForumView: React.FC<ForumViewProps> = ({
                       triggerHaptic('selection');
                       setVoteAction('downrated');
                     }}
-                    className={`min-h-[44px] py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors border ${
+                    className={`min-h-[44px] py-2 rounded-full text-xs font-bold flex items-center justify-center gap-1.5 transition-colors border ${
                       voteAction === 'downrated'
                         ? 'bg-white/[0.14] text-white border-white/30'
-                        : 'bg-white/[0.04] text-slate-400 hover:text-white border-white/[0.06]'
+                        : 'bg-white/[0.04] text-neutral-400 hover:text-white border-white/[0.06]'
                     }`}
                   >
-                    <ArrowBigDown className="w-4 h-4 text-slate-200 fill-slate-200" />
+                    <ArrowBigDown className="w-4 h-4 text-[#E5E5E5] fill-[#E5E5E5]" />
                     <span>Downrate (-1)</span>
                   </button>
                 </div>
@@ -540,23 +561,23 @@ export const ForumView: React.FC<ForumViewProps> = ({
                     onChange={(e) => setNewContent(e.target.value)}
                     placeholder="Share on-the-ground reality, policy feedback, or evidence..."
                     maxLength={320}
-                    className="w-full p-3.5 rounded-2xl bg-[#12151E] border border-white/[0.1] text-sm text-white placeholder-slate-400 focus:outline-none focus:border-white/40"
+                    className="w-full p-3.5 rounded-2xl bg-[#141414] border border-white/[0.1] text-sm text-white placeholder-neutral-400 focus:outline-none focus:border-white/40"
                   />
-                  <div className="flex justify-between text-[11px] text-slate-400 font-mono tabular-nums">
+                  <div className="flex justify-between text-[11px] text-neutral-400 font-mono tabular-nums">
                     <span>Zero-Knowledge Signed</span>
                     <span>{newContent.length}/320</span>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between gap-3">
-                  <label htmlFor="state-select" className="text-xs font-semibold text-slate-300">
+                  <label htmlFor="state-select" className="text-xs font-semibold text-neutral-300">
                     Constituency
                   </label>
                   <select
                     id="state-select"
                     value={authorState}
                     onChange={(e) => setAuthorState(e.target.value)}
-                    className="min-h-[40px] px-3 py-1.5 rounded-xl bg-[#12151E] border border-white/[0.1] text-xs text-white focus:outline-none"
+                    className="min-h-[40px] px-3 py-1.5 rounded-xl bg-[#141414] border border-white/[0.1] text-xs text-white focus:outline-none"
                   >
                     <option value="Lagos State">Lagos State</option>
                     <option value="FCT Abuja">FCT Abuja</option>
@@ -568,43 +589,33 @@ export const ForumView: React.FC<ForumViewProps> = ({
                   </select>
                 </div>
 
-                <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#12151E] border border-white/[0.06]">
+                <div className="flex items-center justify-between p-3.5 rounded-2xl surface-card">
                   <div className="flex items-center gap-2.5">
-                    <Lock className="w-4 h-4 text-slate-200" />
+                    <Lock className="w-4 h-4 text-[#E5E5E5]" />
                     <div>
                       <span className="text-xs font-semibold text-white block">Post Anonymously</span>
-                      <span className="text-[11px] text-slate-400">Unlinks phone and handle</span>
+                      <span className="text-[11px] text-neutral-400">Unlinks phone and handle</span>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={isAnonymous}
-                    aria-label="Post anonymously"
-                    onClick={() => {
+                  <Switch
+                    checked={isAnonymous}
+                    onCheckedChange={(checked) => {
                       triggerHaptic('selection');
-                      setIsAnonymous((v) => !v);
+                      setIsAnonymous(checked);
                     }}
-                    className={`w-11 h-6 rounded-full transition-colors relative ${
-                      isAnonymous ? 'bg-white' : 'bg-slate-700'
-                    }`}
-                  >
-                    <span
-                      className={`absolute top-0.5 w-5 h-5 rounded-full bg-black transition-transform ${
-                        isAnonymous ? 'right-0.5' : 'left-0.5'
-                      }`}
-                    />
-                  </button>
+                    aria-label="Post anonymously"
+                  />
                 </div>
 
-                <button
+                <Button
                   type="submit"
+                  variant="filled"
+                  icon={<Send className="w-4 h-4" />}
                   disabled={!newContent.trim()}
-                  className="w-full min-h-[48px] py-3 rounded-2xl bg-white text-black font-bold text-sm hover:bg-slate-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full !h-12 !text-sm"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>Publish to Ledger</span>
-                </button>
+                  Publish to Ledger
+                </Button>
               </form>
             </motion.div>
           </div>
@@ -618,43 +629,51 @@ export const ForumView: React.FC<ForumViewProps> = ({
             <div className="absolute inset-0" onClick={() => setActiveThreadPostId(null)} />
 
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="thread-modal-title"
               initial={{ y: '100%', opacity: 0.8 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}
               transition={{ type: 'spring', damping: 30, stiffness: 350 }}
-              className="relative z-10 w-full max-w-md bg-[#0C0F17] border-t sm:border border-white/[0.12] sm:rounded-3xl rounded-t-3xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl"
+              className="relative z-10 w-full max-w-md glass-sheet border-t sm:border border-white/[0.12] sm:rounded-3xl rounded-t-3xl max-h-[92vh] flex flex-col overflow-hidden"
             >
               <div className="w-10 h-1.5 bg-white/20 rounded-full mx-auto mt-2.5 mb-1 sm:hidden" />
 
               <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08]">
-                <h3 className="text-sm font-bold text-white font-['Outfit']">Thread Replies</h3>
-                <button
+                <h3
+                  id="thread-modal-title"
+                  className="text-sm font-bold text-white font-['Outfit']"
+                >
+                  Thread Replies
+                </h3>
+                <Button
                   type="button"
+                  variant="glass"
+                  icon={<X className="w-4 h-4" />}
                   onClick={() => setActiveThreadPostId(null)}
                   aria-label="Close thread"
-                  className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-slate-300 hover:text-white"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                  className="!h-9 !w-9"
+                />
               </div>
 
               <div className="p-5 overflow-y-auto no-scrollbar space-y-4">
                 <div className="surface-card rounded-2xl p-4 space-y-2">
                   <div className="flex items-center gap-2 text-xs">
                     <span className="font-bold text-white">{activeThreadPost.author}</span>
-                    <span className="text-slate-400 font-mono">{activeThreadPost.handle}</span>
-                    <span className="text-slate-400">· {activeThreadPost.timestamp}</span>
+                    <span className="text-neutral-400 font-mono">{activeThreadPost.handle}</span>
+                    <span className="text-neutral-400">· {activeThreadPost.timestamp}</span>
                   </div>
-                  <p className="text-sm text-slate-200 leading-relaxed">{activeThreadPost.content}</p>
+                  <p className="text-sm text-neutral-200 leading-relaxed">{activeThreadPost.content}</p>
                 </div>
 
                 <div className="space-y-3">
-                  <span className="text-xs font-semibold text-slate-400 block">
+                  <span className="text-xs font-semibold text-neutral-400 block">
                     Replies ({activeThreadPost.replies.length})
                   </span>
 
                   {activeThreadPost.replies.length === 0 ? (
-                    <div className="text-center py-6 text-slate-400 text-xs">
+                    <div className="text-center py-6 text-neutral-400 text-xs">
                       No replies yet. Start the discussion below.
                     </div>
                   ) : (
@@ -665,13 +684,13 @@ export const ForumView: React.FC<ForumViewProps> = ({
                             <div className="flex items-center gap-1.5">
                               <span className="font-bold text-white">{reply.author}</span>
                               {reply.isVerified && (
-                                <ShieldCheck className="w-3 h-3 text-slate-200" />
+                                <ShieldCheck className="w-3 h-3 text-[#E5E5E5]" />
                               )}
-                              <span className="text-slate-400">· {reply.state}</span>
+                              <span className="text-neutral-400">· {reply.state}</span>
                             </div>
-                            <span className="text-slate-400">{reply.timestamp}</span>
+                            <span className="text-neutral-400">{reply.timestamp}</span>
                           </div>
-                          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                          <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed">
                             {reply.content}
                           </p>
                         </div>
@@ -683,7 +702,7 @@ export const ForumView: React.FC<ForumViewProps> = ({
 
               <form
                 onSubmit={handleSendReply}
-                className="p-4 border-t border-white/[0.08] bg-[#0C0F17] flex gap-2"
+                className="p-4 border-t border-white/[0.08] bg-[#101010]/90 flex gap-2 items-center"
               >
                 <label htmlFor="reply-input" className="sr-only">
                   Reply to thread
@@ -694,16 +713,16 @@ export const ForumView: React.FC<ForumViewProps> = ({
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
                   placeholder="Write an anonymous reply..."
-                  className="flex-1 min-h-[44px] px-4 py-2 rounded-xl bg-[#12151E] border border-white/[0.1] text-sm text-white placeholder-slate-400 focus:outline-none focus:border-white/40"
+                  className="flex-1 min-h-[42px] px-4 py-2 rounded-full bg-[#161616] border border-white/[0.1] text-sm text-white placeholder-neutral-400 focus:outline-none focus:border-white/40"
                 />
-                <button
+                <Button
                   type="submit"
+                  variant="filled"
+                  icon={<Send className="w-4 h-4" />}
                   disabled={!replyContent.trim()}
                   aria-label="Send reply"
-                  className="min-h-[44px] px-4 rounded-xl bg-white hover:bg-slate-200 text-black font-bold text-xs disabled:opacity-50 flex items-center justify-center"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
+                  className="!h-10 !w-10 shrink-0"
+                />
               </form>
             </motion.div>
           </div>

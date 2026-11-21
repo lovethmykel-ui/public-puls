@@ -6,9 +6,12 @@ import {
   ArrowDownRight,
   ArrowBigUp,
   ArrowBigDown,
-  X,
   Trophy,
+  ArrowUpDown,
+  Check,
+  X,
 } from 'lucide-react';
+import { Button, Menu, SegmentedControl } from 'glisse';
 import type { Official, Agency } from '../types';
 import { filterAgencies, filterOfficials, type OfficialFilter } from '../utils/civicMath';
 import { triggerHaptic } from '../utils/telegram';
@@ -26,6 +29,19 @@ interface OfficialsViewProps {
 }
 
 type LeaderboardSegment = 'officials' | 'agencies' | 'all';
+
+const SEGMENT_ITEMS = [
+  { value: 'all', label: 'All Ranked' },
+  { value: 'officials', label: 'Officials' },
+  { value: 'agencies', label: 'Agencies' },
+];
+
+const CATEGORY_ITEMS = [
+  { value: 'all', label: 'All' },
+  { value: 'executive', label: 'Executive' },
+  { value: 'governors', label: 'Governors' },
+  { value: 'ministers', label: 'Ministers' },
+];
 
 export const OfficialsView: React.FC<OfficialsViewProps> = ({
   officials,
@@ -56,7 +72,6 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
       )
     : [];
 
-  // Unified ranked list for Podium + Leaderboard
   type RankedItem =
     | { kind: 'official'; item: Official; score: number; change: number }
     | { kind: 'agency'; item: Agency; score: number; change: number };
@@ -95,8 +110,8 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
       rank === 1
         ? 'bg-white text-black'
         : rank === 2
-        ? 'bg-slate-300 text-black'
-        : 'bg-slate-600 text-white';
+        ? 'bg-neutral-300 text-black'
+        : 'bg-neutral-700 text-white';
 
     return (
       <button
@@ -117,7 +132,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
               rank === 1
                 ? 'w-20 h-20 sm:w-24 sm:h-24 ring-white/60'
                 : 'w-16 h-16 sm:w-20 sm:h-20 ring-white/15'
-            } ${!isOfficial ? 'bg-white p-2' : 'bg-[#151A25]'}`}
+            } ${!isOfficial ? 'bg-white p-2' : 'bg-[#1A1A1A]'}`}
           >
             <img
               src={imgSrc}
@@ -136,8 +151,8 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
         <span className="text-xs sm:text-sm font-bold text-white mt-2 line-clamp-1 max-w-[110px] sm:max-w-[140px]">
           {name}
         </span>
-        <span className="text-[11px] text-slate-400 truncate max-w-[110px]">{sub}</span>
-        <span className="mt-1 text-xs font-bold font-mono tabular-nums text-slate-200">
+        <span className="text-[11px] text-neutral-400 truncate max-w-[110px]">{sub}</span>
+        <span className="mt-1 text-xs font-bold font-mono tabular-nums text-neutral-200">
           {entry.score.toFixed(1)}/100
         </span>
       </button>
@@ -146,105 +161,102 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
 
   return (
     <div className="px-4 sm:px-6 pt-4 pb-28 md:pb-12 space-y-5">
-      {/* Centered Hero Title matching fomo Leaderboard */}
+      {/* Centered Hero Title */}
       <div className="text-center space-y-1 pt-1">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-['Outfit']">
           Accountability Index
         </h1>
-        <p className="text-xs sm:text-sm text-slate-400">
+        <p className="text-xs sm:text-sm text-neutral-400">
           Live citizen rankings for elected officials &amp; federal institutions
         </p>
       </div>
 
-      {/* Full-Width 3-Tab Underline Navigation (fomo pattern) */}
-      <div className="grid grid-cols-3 border-b border-white/[0.08]">
-        {(
-          [
-            { id: 'all', label: 'All Ranked' },
-            { id: 'officials', label: 'Officials' },
-            { id: 'agencies', label: 'Agencies' },
-          ] as const
-        ).map((tab) => {
-          const isActive = segment === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => {
-                triggerHaptic('selection');
-                setSegment(tab.id);
-                if (tab.id === 'agencies') setCategoryFilter('all');
-              }}
-              className={`relative min-h-[44px] py-2.5 text-sm font-semibold transition-colors whitespace-nowrap ${
-                isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              {tab.label}
-              {isActive && (
-                <span className="absolute inset-x-4 bottom-0 h-0.5 bg-white rounded-full" />
-              )}
-            </button>
-          );
-        })}
+      {/* Liquid Glass 3-Segment Index Switcher */}
+      <div className="flex justify-center">
+        <SegmentedControl
+          aria-label="Index segment"
+          items={SEGMENT_ITEMS}
+          value={segment}
+          onValueChange={(value) => {
+            triggerHaptic('selection');
+            const next = value as LeaderboardSegment;
+            setSegment(next);
+            if (next === 'agencies') setCategoryFilter('all');
+          }}
+          className="lg-segmented-3"
+        />
       </div>
 
-      {/* Search + Filters Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-200" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchQueryChange(e.target.value)}
-            placeholder="Search official, state, ministry, or agency..."
-            aria-label="Search officials and agencies"
-            className="w-full min-h-[44px] pl-10 pr-9 py-2 rounded-xl bg-[#12151E] border border-white/[0.08] text-sm text-white placeholder-slate-400 focus:outline-none focus:border-white/30 transition-colors"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => onSearchQueryChange('')}
-              aria-label="Clear search"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-slate-200 hover:text-white"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          {segment !== 'agencies' && (
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/[0.06] overflow-x-auto no-scrollbar max-w-full">
-              {(['all', 'executive', 'governors', 'ministers'] as const).map((f) => (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('selection');
-                    setCategoryFilter(f);
-                  }}
-                  className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold capitalize whitespace-nowrap transition-colors ${
-                    categoryFilter === f
-                      ? 'bg-white/[0.12] text-white'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <button
+      {/* Active Global Search Filter Chip (relies on static Header SearchField, no duplicate bar) */}
+      {searchQuery.trim() !== '' && (
+        <div className="surface-card rounded-full pl-4 pr-2 py-1.5 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0 text-xs text-neutral-300">
+            <Search className="w-3.5 h-3.5 text-[#E5E5E5] shrink-0" />
+            <span className="truncate">
+              Filtered by <strong className="text-white">&ldquo;{searchQuery}&rdquo;</strong>
+            </span>
+          </div>
+          <Button
             type="button"
-            onClick={() => {
-              triggerHaptic('selection');
-              setSortBy((prev) => (prev === 'score' ? 'movers' : 'score'));
-            }}
-            className="min-h-[38px] px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.09] border border-white/[0.08] text-xs font-semibold text-slate-200 whitespace-nowrap shrink-0 ml-auto"
+            variant="glass"
+            icon={<X className="w-3.5 h-3.5" />}
+            onClick={() => onSearchQueryChange('')}
+            aria-label="Clear active search filter"
+            className="!h-8 !px-3 !text-xs shrink-0"
           >
-            Sort: {sortBy === 'score' ? 'Score' : '24h'}
-          </button>
+            Clear
+          </Button>
+        </div>
+      )}
+
+      {/* Category Filter & Liquid Glass Sort Menu */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {segment !== 'agencies' ? (
+          <div className="overflow-x-auto no-scrollbar max-w-full">
+            <SegmentedControl
+              aria-label="Official category"
+              items={CATEGORY_ITEMS}
+              value={categoryFilter}
+              onValueChange={(value) => {
+                triggerHaptic('selection');
+                setCategoryFilter(value as OfficialFilter);
+              }}
+              className="lg-segmented-4"
+            />
+          </div>
+        ) : (
+          <div className="text-xs text-neutral-400">
+            Showing federal ministries &amp; commissions
+          </div>
+        )}
+
+        <div className="flex items-center gap-2 ml-auto shrink-0">
+          <span className="text-xs font-medium text-neutral-400 whitespace-nowrap">
+            Sort: <strong className="text-neutral-100">{sortBy === 'score' ? 'Score' : '24h'}</strong>
+          </span>
+          <Menu
+            aria-label="Sort rankings"
+            align="end"
+            icon={<ArrowUpDown className="w-4 h-4" />}
+            items={[
+              {
+                label: 'Trust Score (High to Low)',
+                icon: sortBy === 'score' ? <Check className="w-4 h-4" /> : undefined,
+                onSelect: () => {
+                  triggerHaptic('selection');
+                  setSortBy('score');
+                },
+              },
+              {
+                label: '24h Biggest Movers',
+                icon: sortBy === 'movers' ? <Check className="w-4 h-4" /> : undefined,
+                onSelect: () => {
+                  triggerHaptic('selection');
+                  setSortBy('movers');
+                },
+              },
+            ]}
+          />
         </div>
       </div>
 
@@ -256,7 +268,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
         >
           <div
             aria-hidden="true"
-            className="absolute inset-x-0 top-0 h-32 bg-[radial-gradient(ellipse_at_top,rgba(226,232,240,0.09),transparent_70%)] pointer-events-none"
+            className="absolute inset-x-0 top-0 h-32 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.08),transparent_70%)] pointer-events-none"
           />
           <div className="relative z-10 grid grid-cols-3 gap-2 items-end max-w-lg mx-auto">
             {renderPodiumCard(podiumTop3[1], 2)}
@@ -269,11 +281,11 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
       {/* Summary Benchmark Card */}
       <div className="surface-card rounded-2xl px-4 py-3.5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-white/[0.07] text-slate-200 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-white/[0.07] text-[#E5E5E5] flex items-center justify-center shrink-0">
             <Trophy className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xs text-slate-400">Filtered Cohort Average</div>
+            <div className="text-xs text-neutral-400">Filtered Cohort Average</div>
             <div className="text-sm font-bold text-white font-['Outfit'] tabular-nums">
               {unifiedRanked.length} Tracked {unifiedRanked.length === 1 ? 'Entity' : 'Entities'}
             </div>
@@ -283,28 +295,31 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
           <div className="text-lg font-bold text-white font-mono tabular-nums">
             {avgTrust}/100
           </div>
-          <div className="text-[11px] text-slate-400">Citizen Consensus</div>
+          <div className="text-[11px] text-neutral-400">Citizen Consensus</div>
         </div>
       </div>
 
-      {/* Ranked Rows (fomo clean borderless hairline list) */}
+      {/* Ranked Rows */}
       {unifiedRanked.length === 0 ? (
-        <div className="surface-card rounded-2xl p-8 text-center space-y-2">
+        <div className="surface-card rounded-2xl p-8 text-center space-y-3">
           <p className="text-sm font-semibold text-white">No matching officials or agencies</p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-neutral-400">
             Try clearing your search query or switching category tabs.
           </p>
-          <button
-            type="button"
-            onClick={() => {
-              onSearchQueryChange('');
-              setCategoryFilter('all');
-              setSegment('all');
-            }}
-            className="mt-2 px-4 py-2 rounded-xl bg-white/[0.08] text-xs font-semibold text-white hover:bg-white/[0.12]"
-          >
-            Reset Filters
-          </button>
+          <div className="pt-1 flex justify-center">
+            <Button
+              type="button"
+              variant="glass"
+              onClick={() => {
+                onSearchQueryChange('');
+                setCategoryFilter('all');
+                setSegment('all');
+              }}
+              className="!h-9 !px-4 !text-xs"
+            >
+              Reset Filters
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="divide-y divide-white/[0.06] border-y border-white/[0.06]">
@@ -324,7 +339,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                 className="py-3.5 flex items-center justify-between gap-3"
               >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <span className="w-6 text-xs font-mono font-semibold text-slate-500 tabular-nums shrink-0">
+                  <span className="w-6 text-xs font-mono font-semibold text-neutral-500 tabular-nums shrink-0">
                     {rank}.
                   </span>
 
@@ -352,14 +367,14 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-sm font-semibold text-white truncate group-hover:text-slate-200 transition-colors">
+                        <span className="text-sm font-semibold text-white truncate group-hover:text-neutral-200 transition-colors">
                           {name}
                         </span>
                         {isOfficial && (
-                          <ShieldCheck className="w-3.5 h-3.5 text-slate-200 shrink-0" />
+                          <ShieldCheck className="w-3.5 h-3.5 text-[#E5E5E5] shrink-0" />
                         )}
                       </div>
-                      <p className="text-xs text-slate-400 truncate mt-0.5">{subtitle}</p>
+                      <p className="text-xs text-neutral-400 truncate mt-0.5">{subtitle}</p>
                     </div>
                   </button>
                 </div>
@@ -376,7 +391,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                           : { name: entry.item.name, role: entry.item.headTitle, type: 'agency' }
                       );
                     }}
-                    className="hidden sm:inline-flex min-h-[34px] items-center px-3 py-1 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-xs font-semibold text-slate-200 transition-colors"
+                    className="hidden sm:inline-flex min-h-[34px] items-center px-3.5 py-1 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] text-xs font-semibold text-neutral-200 transition-colors"
                   >
                     Audit
                   </button>
@@ -389,15 +404,19 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                         if (isOfficial) onVoteOfficial(entry.item.id, 'up');
                         else onVoteAgency(entry.item.id, 'up');
                       }}
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors active:scale-95 border ${
+                      className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-95 border ${
                         entry.item.userVote === 'up'
-                          ? 'bg-white/[0.16] border-white/35 text-slate-200'
-                          : 'bg-white/[0.05] border-transparent text-slate-200 hover:bg-white/[0.12]'
+                          ? 'bg-white/[0.16] border-white/35 text-[#E5E5E5]'
+                          : 'bg-white/[0.05] border-transparent text-[#E5E5E5] hover:bg-white/[0.12]'
                       }`}
                       aria-label={`Uprate ${name}`}
                       aria-pressed={entry.item.userVote === 'up'}
                     >
-                      <ArrowBigUp className={`w-4 h-4 ${entry.item.userVote === 'up' ? 'fill-slate-200' : 'fill-current'}`} />
+                      <ArrowBigUp
+                        className={`w-4 h-4 ${
+                          entry.item.userVote === 'up' ? 'fill-[#E5E5E5]' : 'fill-current'
+                        }`}
+                      />
                     </button>
                     <button
                       type="button"
@@ -406,15 +425,19 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                         if (isOfficial) onVoteOfficial(entry.item.id, 'down');
                         else onVoteAgency(entry.item.id, 'down');
                       }}
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors active:scale-95 ${
+                      className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-95 border ${
                         entry.item.userVote === 'down'
-                          ? 'bg-white/[0.22] border border-white/40 text-white'
-                          : 'bg-white/[0.05] text-slate-200 hover:bg-white/[0.12]'
+                          ? 'bg-white/[0.16] border-white/35 text-[#E5E5E5]'
+                          : 'bg-white/[0.05] border-transparent text-[#E5E5E5] hover:bg-white/[0.12]'
                       }`}
                       aria-label={`Downrate ${name}`}
                       aria-pressed={entry.item.userVote === 'down'}
                     >
-                      <ArrowBigDown className="w-4 h-4 fill-current" />
+                      <ArrowBigDown
+                        className={`w-4 h-4 ${
+                          entry.item.userVote === 'down' ? 'fill-[#E5E5E5]' : 'fill-current'
+                        }`}
+                      />
                     </button>
                   </div>
 
@@ -424,13 +447,13 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                     </div>
                     <div
                       className={`text-[11px] font-semibold font-mono tabular-nums flex items-center justify-end gap-0.5 ${
-                        isPositive ? 'text-slate-200' : 'text-slate-400'
+                        isPositive ? 'text-neutral-200' : 'text-neutral-400'
                       }`}
                     >
                       {isPositive ? (
-                        <ArrowUpRight className="w-3 h-3 text-slate-200" />
+                        <ArrowUpRight className="w-3 h-3 text-[#E5E5E5]" />
                       ) : (
-                        <ArrowDownRight className="w-3 h-3 text-slate-200" />
+                        <ArrowDownRight className="w-3 h-3 text-[#E5E5E5]" />
                       )}
                       <span>{isPositive ? `+${entry.change}%` : `${entry.change}%`}</span>
                     </div>

@@ -52,7 +52,7 @@ export const Sparkline: React.FC<SparklineProps> = ({
   }, '');
 
   const areaD = `${pathD} L ${points[points.length - 1].x} ${height} L ${points[0].x} ${height} Z`;
-  const strokeColor = color || (isPositive ? '#E2E8F0' : '#94A3B8');
+  const strokeColor = color || (isPositive ? '#E5E5E5' : '#A3A3A3');
   const lastPoint = points[points.length - 1];
 
   return (

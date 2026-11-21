@@ -2,13 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   Bell,
   ShieldCheck,
-  Search,
-  X,
   ArrowUpRight,
   ArrowDownRight,
   ChevronRight,
   UserCheck,
 } from 'lucide-react';
+import { Button, SearchField, TabBar } from 'glisse';
 import type { Agency, NavTab, Official } from '../types';
 import { searchCivicEntities } from '../utils/civicMath';
 import { triggerHaptic } from '../utils/telegram';
@@ -27,12 +26,12 @@ interface HeaderProps {
   onOpenNotifications?: () => void;
 }
 
-const NAV_ITEMS: { id: NavTab; label: string }[] = [
-  { id: 'home', label: 'Home' },
-  { id: 'officials', label: 'Officials' },
-  { id: 'forum', label: 'Voice' },
-  { id: 'elections', label: 'Elections' },
-  { id: 'profile', label: 'Profile' },
+const NAV_ITEMS: { value: NavTab; label: string }[] = [
+  { value: 'home', label: 'Home' },
+  { value: 'officials', label: 'Officials' },
+  { value: 'forum', label: 'Voice' },
+  { value: 'elections', label: 'Elections' },
+  { value: 'profile', label: 'Profile' },
 ];
 
 export const Header: React.FC<HeaderProps> = ({
@@ -97,8 +96,8 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="fixed top-0 inset-x-0 z-40 bg-[#08090C]/92 backdrop-blur-xl border-b border-white/[0.07] safe-top">
-      <div className="max-w-6xl mx-auto h-16 px-3.5 sm:px-6 flex items-center justify-between gap-2.5 sm:gap-5">
+    <header className="fixed top-0 inset-x-0 z-40 bg-[#0C0C0C]/88 backdrop-blur-2xl border-b border-white/[0.08] safe-top">
+      <div className="max-w-6xl mx-auto h-14 sm:h-16 px-3.5 sm:px-6 flex items-center justify-between gap-2.5 sm:gap-4">
         {/* Zone 1: Custom Uploaded Logo + Brand Wordmark */}
         <button
           type="button"
@@ -108,7 +107,7 @@ export const Header: React.FC<HeaderProps> = ({
             onChangeTab('home');
           }}
           aria-label="PublicPulse Home"
-          className="flex items-center gap-2.5 min-h-[44px] whitespace-nowrap shrink-0 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-xl"
+          className="flex items-center gap-2.5 min-h-[40px] whitespace-nowrap shrink-0 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-full"
         >
           <img
             src="/assets/aistudio/Untitled_design_60f6d4cb.png"
@@ -120,88 +119,54 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
         </button>
 
-        {/* Zone 2: Desktop Single-Line Navigation */}
-        <nav aria-label="Primary navigation" className="hidden lg:flex items-center gap-6 shrink-0">
-          {NAV_ITEMS.map((item) => {
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => {
-                  triggerHaptic('selection');
-                  setIsDropdownOpen(false);
-                  onChangeTab(item.id);
-                }}
-                className={`relative py-5 text-sm font-medium whitespace-nowrap shrink-0 transition-colors focus-visible:outline-none focus-visible:text-white ${
-                  isActive ? 'text-white font-semibold' : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                {item.label}
-                {isActive && (
-                  <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-white" />
-                )}
-              </button>
-            );
-          })}
-        </nav>
+        {/* Zone 2: Desktop Glisse Liquid Glass TabBar */}
+        <div className="hidden lg:flex items-center shrink-0">
+          <TabBar
+            aria-label="Primary navigation"
+            className="lg-tab-bar-desktop"
+            items={NAV_ITEMS}
+            value={activeTab}
+            onValueChange={(value) => {
+              triggerHaptic('selection');
+              setIsDropdownOpen(false);
+              onChangeTab(value as NavTab);
+            }}
+          />
+        </div>
 
-        {/* Global Header Search Bar */}
+        {/* Global Glisse Liquid Glass Search Bar */}
         <div
           ref={searchContainerRef}
-          className="relative flex-1 min-w-0 max-w-sm lg:max-w-xs xl:max-w-sm"
+          className="relative flex-1 min-w-0 max-w-sm lg:max-w-[260px] xl:max-w-xs"
         >
-          <div className="relative flex items-center">
-            <Search
-              aria-hidden="true"
-              className="pointer-events-none absolute left-3 w-4 h-4 text-slate-200 shrink-0"
-            />
-            <input
-              type="text"
-              role="searchbox"
-              inputMode="search"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setIsDropdownOpen(true);
-              }}
-              onFocus={() => {
-                if (trimmedQuery) setIsDropdownOpen(true);
-              }}
-              onKeyDown={handleKeyDown}
-              placeholder="Search leaders & agencies..."
-              aria-label="Search officials or agencies"
-              aria-expanded={isDropdownOpen && trimmedQuery.length > 0}
-              className="w-full h-10 pl-9 pr-8 rounded-full bg-[#12151E] border border-white/[0.08] text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-white/30 transition-colors"
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => {
-                  setQuery('');
-                  setIsDropdownOpen(false);
-                }}
-                aria-label="Clear header search"
-                className="absolute right-2 w-6 h-6 rounded-full flex items-center justify-center text-slate-200 hover:bg-white/[0.08]"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
+          <SearchField
+            value={query}
+            onValueChange={(val) => {
+              setQuery(val);
+              setIsDropdownOpen(val.trim().length > 0);
+            }}
+            onFocus={() => {
+              if (trimmedQuery) setIsDropdownOpen(true);
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder="Search officials..."
+            aria-label="Search officials or agencies"
+            aria-expanded={isDropdownOpen && trimmedQuery.length > 0}
+          />
 
           {/* Instant Search Dropdown */}
           {isDropdownOpen && trimmedQuery.length > 0 && (
             <div
               role="region"
               aria-label="Search results"
-              className="absolute left-0 right-0 sm:min-w-[320px] top-[calc(100%+8px)] rounded-2xl bg-[#0D1018]/98 backdrop-blur-2xl border border-white/[0.1] shadow-2xl overflow-hidden z-50"
+              className="absolute left-0 right-0 sm:min-w-[320px] top-[calc(100%+8px)] rounded-2xl glass-sheet border border-white/[0.12] overflow-hidden z-50"
             >
               {results.length === 0 ? (
                 <div className="px-4 py-6 text-center space-y-1.5">
                   <p className="text-xs font-semibold text-white">
                     No match for &ldquo;{trimmedQuery}&rdquo;
                   </p>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-neutral-400">
                     Try searching by official name, state, or agency acronym.
                   </p>
                 </div>
@@ -215,14 +180,14 @@ export const Header: React.FC<HeaderProps> = ({
                           key={`${item.kind}-${item.id}`}
                           type="button"
                           onClick={() => handleSelectResult(item)}
-                          className="w-full px-3.5 py-2.5 flex items-center justify-between gap-3 text-left hover:bg-white/[0.05] transition-colors"
+                          className="w-full px-3.5 py-2.5 flex items-center justify-between gap-3 text-left hover:bg-white/[0.06] transition-colors"
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             <div
                               className={`w-9 h-9 overflow-hidden shrink-0 ring-1 ring-white/15 ${
                                 item.kind === 'agency'
                                   ? 'rounded-xl bg-white p-1'
-                                  : 'rounded-full bg-[#151A25]'
+                                  : 'rounded-full bg-[#1A1A1A]'
                               }`}
                             >
                               <img
@@ -239,7 +204,7 @@ export const Header: React.FC<HeaderProps> = ({
                               <div className="text-xs font-semibold text-white truncate">
                                 {item.title}
                               </div>
-                              <div className="text-[11px] text-slate-400 truncate">
+                              <div className="text-[11px] text-neutral-400 truncate">
                                 {item.kind === 'official' ? 'Official' : 'Agency'} · {item.subtitle}
                               </div>
                             </div>
@@ -249,11 +214,11 @@ export const Header: React.FC<HeaderProps> = ({
                             <div className="text-xs font-bold text-white font-mono tabular-nums">
                               {item.trustIndex.toFixed(1)}
                             </div>
-                            <div className="text-[10px] font-mono tabular-nums text-slate-400 inline-flex items-center justify-end gap-0.5">
+                            <div className="text-[10px] font-mono tabular-nums text-neutral-400 inline-flex items-center justify-end gap-0.5">
                               {isPositive ? (
-                                <ArrowUpRight className="w-3 h-3 text-slate-200" />
+                                <ArrowUpRight className="w-3 h-3 text-[#E5E5E5]" />
                               ) : (
-                                <ArrowDownRight className="w-3 h-3 text-slate-200" />
+                                <ArrowDownRight className="w-3 h-3 text-[#E5E5E5]" />
                               )}
                               <span>
                                 {isPositive ? `+${item.change24h}%` : `${item.change24h}%`}
@@ -271,12 +236,13 @@ export const Header: React.FC<HeaderProps> = ({
                       triggerHaptic('selection');
                       const q = trimmedQuery;
                       setIsDropdownOpen(false);
+                      setQuery('');
                       onSubmitSearchToIndex(q);
                     }}
-                    className="w-full px-3.5 py-2.5 bg-white/[0.04] hover:bg-white/[0.08] border-t border-white/[0.07] text-xs font-semibold text-slate-200 flex items-center justify-between transition-colors"
+                    className="w-full px-3.5 py-2.5 bg-white/[0.04] hover:bg-white/[0.08] border-t border-white/[0.08] text-xs font-semibold text-[#E5E5E5] flex items-center justify-between transition-colors"
                   >
                     <span>Browse all in Index</span>
-                    <ChevronRight className="w-4 h-4 text-slate-200" />
+                    <ChevronRight className="w-4 h-4 text-[#E5E5E5]" />
                   </button>
                 </>
               )}
@@ -284,50 +250,55 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Zone 3: Verification Action + Notifications (Unified Monochrome Icons) */}
+        {/* Zone 3: Glisse Glass Action Buttons (Unified Monochrome Icons) */}
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('selection');
-              onOpenVerification?.();
-            }}
-            aria-label={isVerified ? 'Verified Citizen ID' : 'Verify Citizen ID'}
-            className={`h-10 px-2.5 sm:px-3.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 flex items-center gap-1.5 transition-colors active:scale-95 ${
-              isVerified
-                ? 'bg-white/[0.06] hover:bg-white/[0.1] text-slate-100 border border-white/[0.08]'
-                : 'bg-white text-black hover:bg-slate-200'
-            }`}
-          >
-            {isVerified ? (
-              <>
-                <ShieldCheck className="w-4 h-4 text-slate-200 shrink-0" />
-                <span className="hidden sm:inline">Verified</span>
-              </>
-            ) : (
-              <>
-                <UserCheck className="w-4 h-4 shrink-0" />
-                <span className="hidden sm:inline">Verify ID</span>
-              </>
-            )}
-          </button>
+          <div className="sm:hidden">
+            <Button
+              type="button"
+              variant={isVerified ? 'glass' : 'filled'}
+              icon={isVerified ? <ShieldCheck /> : <UserCheck />}
+              aria-label={isVerified ? 'Verified Citizen ID' : 'Verify Citizen ID'}
+              onClick={() => {
+                triggerHaptic('selection');
+                onOpenVerification?.();
+              }}
+            />
+          </div>
+          <div className="hidden sm:block">
+            <Button
+              type="button"
+              variant={isVerified ? 'glass' : 'filled'}
+              icon={isVerified ? <ShieldCheck /> : <UserCheck />}
+              aria-label={isVerified ? 'Verified Citizen ID' : 'Verify Citizen ID'}
+              onClick={() => {
+                triggerHaptic('selection');
+                onOpenVerification?.();
+              }}
+            >
+              {isVerified ? 'Verified' : 'Verify ID'}
+            </Button>
+          </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('light');
-              onOpenNotifications?.();
-            }}
-            className="relative w-10 h-10 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] flex items-center justify-center text-slate-200 hover:text-white active:scale-95 transition-all shrink-0"
-            aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
-          >
-            <Bell className="w-4 h-4 text-slate-200" />
+          <div className="relative shrink-0">
+            <Button
+              type="button"
+              variant="glass"
+              icon={<Bell />}
+              aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+              onClick={() => {
+                triggerHaptic('light');
+                onOpenNotifications?.();
+              }}
+            />
             {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-white text-black text-[10px] font-bold flex items-center justify-center tabular-nums">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-white text-[#0C0C0C] text-[10px] font-bold flex items-center justify-center tabular-nums"
+              >
                 {unreadCount}
               </span>
             )}
-          </button>
+          </div>
         </div>
       </div>
     </header>

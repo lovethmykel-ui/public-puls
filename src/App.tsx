@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, X, Check } from 'lucide-react';
+import { Button } from 'glisse';
 import type { NavTab, Official, Agency, ForumPost, ForumReply } from './types';
 import { OFFICIALS, AGENCIES, FORUM_POSTS } from './data/mockData';
 import {
@@ -73,6 +74,15 @@ export const App: React.FC = () => {
   useEffect(() => {
     initTelegramApp();
   }, []);
+
+  useEffect(() => {
+    if (!isNotificationsOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsNotificationsOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isNotificationsOpen]);
 
   const selectedOfficial = officials.find((o) => o.id === selectedOfficialId) || null;
   const selectedAgency = agencies.find((a) => a.id === selectedAgencyId) || null;
@@ -194,7 +204,7 @@ export const App: React.FC = () => {
           onOpenNotifications={() => setIsNotificationsOpen(true)}
         />
 
-        <main className="flex-1 w-full relative pt-16">
+        <main className="flex-1 w-full relative pt-14 sm:pt-16">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -309,18 +319,24 @@ export const App: React.FC = () => {
                 onClick={() => setIsNotificationsOpen(false)}
               />
               <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="notifications-title"
                 initial={{ y: '100%', opacity: 0.8 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: '100%', opacity: 0 }}
                 transition={{ type: 'spring', damping: 30, stiffness: 350 }}
-                className="relative z-10 w-full max-w-md bg-[#0C0F17] border-t sm:border border-white/[0.12] sm:rounded-3xl rounded-t-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl"
+                className="relative z-10 w-full max-w-md glass-sheet border-t sm:border border-white/[0.12] sm:rounded-3xl rounded-t-3xl max-h-[85vh] flex flex-col overflow-hidden"
               >
                 <div className="w-10 h-1.5 bg-white/20 rounded-full mx-auto mt-2.5 mb-1 sm:hidden" />
 
                 <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08]">
                   <div className="flex items-center gap-2">
-                    <Bell className="w-4 h-4 text-slate-200" />
-                    <h3 className="text-sm font-bold text-white font-['Outfit']">
+                    <Bell className="w-4 h-4 text-[#E5E5E5]" />
+                    <h3
+                      id="notifications-title"
+                      className="text-sm font-bold text-white font-['Outfit']"
+                    >
                       Civic Alerts
                     </h3>
                   </div>
@@ -331,20 +347,20 @@ export const App: React.FC = () => {
                         onClick={() =>
                           setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })))
                         }
-                        className="text-xs font-semibold text-slate-200 hover:text-white hover:underline flex items-center gap-1"
+                        className="text-xs font-semibold text-neutral-200 hover:text-white hover:underline flex items-center gap-1"
                       >
-                        <Check className="w-3.5 h-3.5 text-slate-200" />
+                        <Check className="w-3.5 h-3.5 text-[#E5E5E5]" />
                         <span>Mark all read</span>
                       </button>
                     )}
-                    <button
+                    <Button
                       type="button"
+                      variant="glass"
+                      icon={<X className="w-4 h-4" />}
                       onClick={() => setIsNotificationsOpen(false)}
                       aria-label="Close notifications"
-                      className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-slate-200 hover:text-white"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                      className="!h-9 !w-9"
+                    />
                   </div>
                 </div>
 
@@ -362,8 +378,8 @@ export const App: React.FC = () => {
                     >
                       <div className="space-y-1">
                         <div className="text-sm font-semibold text-white">{item.title}</div>
-                        <p className="text-xs text-slate-400 leading-relaxed">{item.detail}</p>
-                        <span className="text-[11px] text-slate-500 block">{item.time}</span>
+                        <p className="text-xs text-neutral-400 leading-relaxed">{item.detail}</p>
+                        <span className="text-[11px] text-neutral-500 block">{item.time}</span>
                       </div>
                       {item.unread && (
                         <span
