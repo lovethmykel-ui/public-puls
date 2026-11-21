@@ -227,8 +227,8 @@ export const App: React.FC = () => {
                 <OfficialsView
                   officials={officials}
                   agencies={agencies}
-                  externalSearchQuery={indexSearchQuery}
-                  onExternalSearchConsumed={() => setIndexSearchQuery('')}
+                  searchQuery={indexSearchQuery}
+                  onSearchQueryChange={setIndexSearchQuery}
                   onVoteOfficial={handleVoteOfficial}
                   onVoteAgency={handleVoteAgency}
                   onSelectOfficial={(official) => setSelectedOfficialId(official.id)}

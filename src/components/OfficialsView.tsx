@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Search,
   ShieldCheck,
@@ -16,8 +16,8 @@ import { triggerHaptic } from '../utils/telegram';
 interface OfficialsViewProps {
   officials: Official[];
   agencies: Agency[];
-  externalSearchQuery?: string;
-  onExternalSearchConsumed?: () => void;
+  searchQuery: string;
+  onSearchQueryChange: (query: string) => void;
   onVoteOfficial: (officialId: string, direction: 'up' | 'down') => void;
   onVoteAgency: (agencyId: string, direction: 'up' | 'down') => void;
   onSelectOfficial: (official: Official) => void;
@@ -30,8 +30,8 @@ type LeaderboardSegment = 'officials' | 'agencies' | 'all';
 export const OfficialsView: React.FC<OfficialsViewProps> = ({
   officials,
   agencies,
-  externalSearchQuery,
-  onExternalSearchConsumed,
+  searchQuery,
+  onSearchQueryChange,
   onVoteOfficial,
   onVoteAgency,
   onSelectOfficial,
@@ -41,16 +41,6 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
   const [segment, setSegment] = useState<LeaderboardSegment>('all');
   const [categoryFilter, setCategoryFilter] = useState<OfficialFilter>('all');
   const [sortBy, setSortBy] = useState<'score' | 'movers'>('score');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  useEffect(() => {
-    if (externalSearchQuery && externalSearchQuery.trim()) {
-      setSearchQuery(externalSearchQuery);
-      setSegment('all');
-      setCategoryFilter('all');
-      onExternalSearchConsumed?.();
-    }
-  }, [externalSearchQuery, onExternalSearchConsumed]);
 
   const effectiveOfficialFilter: OfficialFilter =
     segment === 'agencies' ? 'agencies' : categoryFilter;
@@ -205,7 +195,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => onSearchQueryChange(e.target.value)}
             placeholder="Search official, state, ministry, or agency..."
             aria-label="Search officials and agencies"
             className="w-full min-h-[44px] pl-10 pr-9 py-2 rounded-xl bg-[#12151E] border border-white/[0.08] text-sm text-white placeholder-slate-400 focus:outline-none focus:border-white/30 transition-colors"
@@ -213,7 +203,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
           {searchQuery && (
             <button
               type="button"
-              onClick={() => setSearchQuery('')}
+              onClick={() => onSearchQueryChange('')}
               aria-label="Clear search"
               className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-slate-200 hover:text-white"
             >
@@ -285,7 +275,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
           <div>
             <div className="text-xs text-slate-400">Filtered Cohort Average</div>
             <div className="text-sm font-bold text-white font-['Outfit'] tabular-nums">
-              {unifiedRanked.length} Tracked Entities
+              {unifiedRanked.length} Tracked {unifiedRanked.length === 1 ? 'Entity' : 'Entities'}
             </div>
           </div>
         </div>
@@ -307,7 +297,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
           <button
             type="button"
             onClick={() => {
-              setSearchQuery('');
+              onSearchQueryChange('');
               setCategoryFilter('all');
               setSegment('all');
             }}
@@ -399,15 +389,15 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                         if (isOfficial) onVoteOfficial(entry.item.id, 'up');
                         else onVoteAgency(entry.item.id, 'up');
                       }}
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors active:scale-95 ${
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors active:scale-95 border ${
                         entry.item.userVote === 'up'
-                          ? 'bg-white text-black'
-                          : 'bg-white/[0.05] text-slate-200 hover:bg-white/[0.12]'
+                          ? 'bg-white/[0.16] border-white/35 text-slate-200'
+                          : 'bg-white/[0.05] border-transparent text-slate-200 hover:bg-white/[0.12]'
                       }`}
                       aria-label={`Uprate ${name}`}
                       aria-pressed={entry.item.userVote === 'up'}
                     >
-                      <ArrowBigUp className="w-4 h-4 fill-current" />
+                      <ArrowBigUp className={`w-4 h-4 ${entry.item.userVote === 'up' ? 'fill-slate-200' : 'fill-current'}`} />
                     </button>
                     <button
                       type="button"

@@ -157,7 +157,9 @@ export const Header: React.FC<HeaderProps> = ({
               className="pointer-events-none absolute left-3 w-4 h-4 text-slate-200 shrink-0"
             />
             <input
-              type="search"
+              type="text"
+              role="searchbox"
+              inputMode="search"
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -167,7 +169,7 @@ export const Header: React.FC<HeaderProps> = ({
                 if (trimmedQuery) setIsDropdownOpen(true);
               }}
               onKeyDown={handleKeyDown}
-              placeholder="Search officials or agencies..."
+              placeholder="Search leaders & agencies..."
               aria-label="Search officials or agencies"
               aria-expanded={isDropdownOpen && trimmedQuery.length > 0}
               className="w-full h-10 pl-9 pr-8 rounded-full bg-[#12151E] border border-white/[0.08] text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-white/30 transition-colors"
