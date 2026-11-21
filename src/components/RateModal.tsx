@@ -51,7 +51,7 @@ export const RateModal: React.FC<RateModalProps> = ({
         particleCount: 60,
         spread: 60,
         origin: { y: 0.6 },
-        colors: ['#00E676', '#10B981', '#38BDF8'],
+        colors: ['#FFFFFF', '#E2E8F0', '#94A3B8'],
       });
 
       onSubmitRating(target, {
@@ -106,8 +106,8 @@ export const RateModal: React.FC<RateModalProps> = ({
           <div className="p-5 overflow-y-auto no-scrollbar space-y-5">
             {isSuccess ? (
               <div className="text-center py-8 space-y-3">
-                <div className="w-16 h-16 mx-auto rounded-full bg-emerald-500/20 border-2 border-[#00E676] flex items-center justify-center">
-                  <CheckCircle2 className="w-8 h-8 text-[#00E676]" />
+                <div className="w-16 h-16 mx-auto rounded-full bg-white/[0.08] border-2 border-white/40 flex items-center justify-center">
+                  <CheckCircle2 className="w-8 h-8 text-slate-200" />
                 </div>
                 <h4 className="text-lg font-bold text-white font-['Outfit']">
                   Audit Rating Recorded
@@ -128,10 +128,10 @@ export const RateModal: React.FC<RateModalProps> = ({
                   <div
                     className={`text-xs font-bold ${
                       overallScore >= 70
-                        ? 'text-[#00E676]'
+                        ? 'text-white'
                         : overallScore >= 50
-                        ? 'text-amber-400'
-                        : 'text-red-400'
+                        ? 'text-slate-300'
+                        : 'text-slate-400'
                     }`}
                   >
                     {overallScore >= 70
@@ -154,7 +154,7 @@ export const RateModal: React.FC<RateModalProps> = ({
                         <label htmlFor={slider.id} className="text-slate-300 font-medium">
                           {slider.label}
                         </label>
-                        <span className="font-bold text-[#00E676] font-mono tabular-nums">
+                        <span className="font-bold text-white font-mono tabular-nums">
                           {slider.val}%
                         </span>
                       </div>
@@ -168,7 +168,7 @@ export const RateModal: React.FC<RateModalProps> = ({
                           triggerHaptic('selection');
                           slider.set(Number(e.target.value));
                         }}
-                        className="w-full accent-[#00E676] bg-white/[0.08] h-2 rounded-lg cursor-pointer"
+                        className="w-full accent-white bg-white/[0.08] h-2 rounded-lg cursor-pointer"
                       />
                     </div>
                   ))}
@@ -184,13 +184,13 @@ export const RateModal: React.FC<RateModalProps> = ({
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     placeholder="Provide specific evidence or local context..."
-                    className="w-full px-4 py-2.5 rounded-2xl bg-[#12151E] border border-white/[0.1] text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#00E676]"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-[#12151E] border border-white/[0.1] text-xs text-white placeholder-slate-400 focus:outline-none focus:border-white/40"
                   />
                 </div>
 
                 <div className="surface-card rounded-2xl p-3.5 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <Lock className="w-4 h-4 text-[#00E676]" />
+                    <Lock className="w-4 h-4 text-slate-200" />
                     <div>
                       <span className="text-xs font-semibold text-white block">
                         Anonymous ZK-Signature
@@ -210,7 +210,7 @@ export const RateModal: React.FC<RateModalProps> = ({
                       setIsAnonymous((v) => !v);
                     }}
                     className={`w-11 h-6 rounded-full transition-colors relative ${
-                      isAnonymous ? 'bg-[#00E676]' : 'bg-slate-700'
+                      isAnonymous ? 'bg-white' : 'bg-slate-700'
                     }`}
                   >
                     <span
@@ -230,7 +230,7 @@ export const RateModal: React.FC<RateModalProps> = ({
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="w-full min-h-[48px] py-3 rounded-2xl bg-[#00E676] hover:bg-[#00cf6a] text-black font-bold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                className="w-full min-h-[48px] py-3 rounded-2xl bg-white hover:bg-slate-200 text-black font-bold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
                 <span>{isSubmitting ? 'Recording Audit...' : 'Submit Verified Rating'}</span>

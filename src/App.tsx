@@ -65,6 +65,7 @@ export const App: React.FC = () => {
 
   const [selectedOfficialId, setSelectedOfficialId] = useState<string | null>(null);
   const [selectedAgencyId, setSelectedAgencyId] = useState<string | null>(null);
+  const [indexSearchQuery, setIndexSearchQuery] = useState('');
   const [isVerificationOpen, setIsVerificationOpen] = useState(false);
   const [rateTarget, setRateTarget] = useState<RateTarget | null>(null);
   const [isVerified, setIsVerified] = useState(true);
@@ -178,13 +179,22 @@ export const App: React.FC = () => {
             setActiveTab(tab);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
+          officials={officials}
+          agencies={agencies}
+          onSelectOfficial={(official) => setSelectedOfficialId(official.id)}
+          onSelectAgency={(agency) => setSelectedAgencyId(agency.id)}
+          onSubmitSearchToIndex={(q) => {
+            setIndexSearchQuery(q);
+            setActiveTab('officials');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
           isVerified={isVerified}
           unreadCount={unreadCount}
           onOpenVerification={() => setIsVerificationOpen(true)}
           onOpenNotifications={() => setIsNotificationsOpen(true)}
         />
 
-        <main className="flex-1 w-full relative">
+        <main className="flex-1 w-full relative pt-16">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -217,6 +227,8 @@ export const App: React.FC = () => {
                 <OfficialsView
                   officials={officials}
                   agencies={agencies}
+                  externalSearchQuery={indexSearchQuery}
+                  onExternalSearchConsumed={() => setIndexSearchQuery('')}
                   onVoteOfficial={handleVoteOfficial}
                   onVoteAgency={handleVoteAgency}
                   onSelectOfficial={(official) => setSelectedOfficialId(official.id)}
@@ -307,7 +319,7 @@ export const App: React.FC = () => {
 
                 <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08]">
                   <div className="flex items-center gap-2">
-                    <Bell className="w-4 h-4 text-[#00E676]" />
+                    <Bell className="w-4 h-4 text-slate-200" />
                     <h3 className="text-sm font-bold text-white font-['Outfit']">
                       Civic Alerts
                     </h3>
@@ -319,9 +331,9 @@ export const App: React.FC = () => {
                         onClick={() =>
                           setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })))
                         }
-                        className="text-xs font-semibold text-[#00E676] hover:underline flex items-center gap-1"
+                        className="text-xs font-semibold text-slate-200 hover:text-white hover:underline flex items-center gap-1"
                       >
-                        <Check className="w-3.5 h-3.5" />
+                        <Check className="w-3.5 h-3.5 text-slate-200" />
                         <span>Mark all read</span>
                       </button>
                     )}
@@ -329,7 +341,7 @@ export const App: React.FC = () => {
                       type="button"
                       onClick={() => setIsNotificationsOpen(false)}
                       aria-label="Close notifications"
-                      className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-slate-300 hover:text-white"
+                      className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-slate-200 hover:text-white"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -356,7 +368,7 @@ export const App: React.FC = () => {
                       {item.unread && (
                         <span
                           aria-label="Unread"
-                          className="w-2 h-2 rounded-full bg-[#00E676] mt-1.5 shrink-0"
+                          className="w-2 h-2 rounded-full bg-white mt-1.5 shrink-0"
                         />
                       )}
                     </button>

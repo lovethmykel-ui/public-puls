@@ -177,14 +177,14 @@ export const ForumView: React.FC<ForumViewProps> = ({
             triggerHaptic('medium');
             setIsComposeOpen(true);
           }}
-          className="min-h-[40px] px-4 py-2 rounded-full bg-[#00E676] hover:bg-[#00cf6a] text-black text-xs font-bold active:scale-95 transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0"
+          className="min-h-[40px] px-4 py-2 rounded-full bg-white hover:bg-slate-200 text-black text-xs font-bold active:scale-95 transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
           <span>Speak Up</span>
         </button>
       </div>
 
-      {/* Full-Width Underline Feed Tabs (fomo Global / Following pattern) */}
+      {/* Full-Width Underline Feed Tabs */}
       <div className="grid grid-cols-4 border-b border-white/[0.08]">
         {(['trending', 'latest', 'uprated', 'downrated'] as const).map((tab) => {
           const isActive = activeFilter === tab;
@@ -202,7 +202,7 @@ export const ForumView: React.FC<ForumViewProps> = ({
             >
               {tab}
               {isActive && (
-                <span className="absolute inset-x-3 bottom-0 h-0.5 bg-[#00E676] rounded-full" />
+                <span className="absolute inset-x-3 bottom-0 h-0.5 bg-white rounded-full" />
               )}
             </button>
           );
@@ -235,11 +235,11 @@ export const ForumView: React.FC<ForumViewProps> = ({
         <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-white">PublicPulse</span>
-            <ShieldCheck className="w-3.5 h-3.5 text-[#00E676]" />
+            <ShieldCheck className="w-3.5 h-3.5 text-slate-200" />
             <span>· {AI_DAILY_BRIEF.date}</span>
           </div>
           <span className="flex items-center gap-1 text-slate-400">
-            <Pin className="w-3 h-3" />
+            <Pin className="w-3 h-3 text-slate-200" />
             <span>Pinned</span>
           </span>
         </div>
@@ -263,7 +263,7 @@ export const ForumView: React.FC<ForumViewProps> = ({
           <button
             type="button"
             onClick={() => setBriefExpanded((v) => !v)}
-            className="text-xs font-semibold text-[#00E676] hover:underline pt-0.5"
+            className="text-xs font-semibold text-slate-200 hover:text-white hover:underline pt-0.5"
           >
             {briefExpanded ? 'Show less' : 'Read more'}
           </button>
@@ -304,7 +304,7 @@ export const ForumView: React.FC<ForumViewProps> = ({
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="text-sm font-bold text-white">{post.author}</span>
                         {post.isVerified && (
-                          <ShieldCheck className="w-3.5 h-3.5 text-[#00E676] shrink-0" />
+                          <ShieldCheck className="w-3.5 h-3.5 text-slate-200 shrink-0" />
                         )}
                         <span className="text-xs text-slate-400 font-mono">{post.handle}</span>
                       </div>
@@ -315,16 +315,16 @@ export const ForumView: React.FC<ForumViewProps> = ({
                   </div>
                 </div>
 
-                {/* Inline Tagged Action Line (fomo style `opened 40x Short`) */}
+                {/* Inline Tagged Action Line */}
                 {post.taggedEntity && (
                   <div className="pl-[52px]">
                     <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold ${
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold border ${
                         post.taggedEntity.voteAction === 'uprated'
-                          ? 'bg-emerald-500/15 text-[#00E676]'
+                          ? 'bg-white/[0.1] border-white/[0.16] text-white'
                           : post.taggedEntity.voteAction === 'downrated'
-                          ? 'bg-red-500/15 text-red-400'
-                          : 'bg-blue-500/15 text-blue-300'
+                          ? 'bg-white/[0.04] border-white/[0.08] text-slate-300'
+                          : 'bg-white/[0.06] border-white/[0.1] text-slate-200'
                       }`}
                     >
                       {post.taggedEntity.voteAction === 'uprated'
@@ -346,15 +346,16 @@ export const ForumView: React.FC<ForumViewProps> = ({
                     <button
                       type="button"
                       onClick={() => onVotePost(post.id, 'up')}
-                      className={`min-h-[36px] px-2.5 rounded-lg flex items-center gap-1 transition-colors ${
+                      aria-pressed={post.userVote === 'up'}
+                      className={`min-h-[36px] px-2.5 rounded-lg flex items-center gap-1 transition-colors border ${
                         post.userVote === 'up'
-                          ? 'bg-emerald-500/15 text-[#00E676] font-bold'
-                          : 'hover:bg-white/[0.05] hover:text-white'
+                          ? 'bg-white/[0.14] border-white/25 text-white font-bold'
+                          : 'border-transparent hover:bg-white/[0.05] hover:text-white'
                       }`}
                       aria-label={`Uprate post by ${post.author}`}
                     >
                       <ArrowBigUp
-                        className={`w-4 h-4 ${post.userVote === 'up' ? 'fill-current' : ''}`}
+                        className={`w-4 h-4 text-slate-200 ${post.userVote === 'up' ? 'fill-slate-200' : ''}`}
                       />
                       <span className="font-mono tabular-nums">{post.upvotes}</span>
                     </button>
@@ -362,15 +363,16 @@ export const ForumView: React.FC<ForumViewProps> = ({
                     <button
                       type="button"
                       onClick={() => onVotePost(post.id, 'down')}
-                      className={`min-h-[36px] px-2 rounded-lg flex items-center gap-1 transition-colors ${
+                      aria-pressed={post.userVote === 'down'}
+                      className={`min-h-[36px] px-2 rounded-lg flex items-center gap-1 transition-colors border ${
                         post.userVote === 'down'
-                          ? 'bg-red-500/15 text-red-400 font-bold'
-                          : 'hover:bg-white/[0.05] hover:text-red-400'
+                          ? 'bg-white/[0.1] border-white/20 text-white font-bold'
+                          : 'border-transparent hover:bg-white/[0.05] hover:text-white'
                       }`}
                       aria-label={`Downrate post by ${post.author}`}
                     >
                       <ArrowBigDown
-                        className={`w-4 h-4 ${post.userVote === 'down' ? 'fill-current' : ''}`}
+                        className={`w-4 h-4 text-slate-200 ${post.userVote === 'down' ? 'fill-slate-200' : ''}`}
                       />
                       {post.downvotes > 0 && (
                         <span className="font-mono tabular-nums">{post.downvotes}</span>
@@ -386,7 +388,7 @@ export const ForumView: React.FC<ForumViewProps> = ({
                       className="min-h-[36px] px-2.5 rounded-lg flex items-center gap-1.5 hover:bg-white/[0.05] hover:text-white transition-colors"
                       aria-label={`Open ${post.repliesCount} replies`}
                     >
-                      <MessageSquare className="w-4 h-4" />
+                      <MessageSquare className="w-4 h-4 text-slate-200" />
                       <span className="font-mono tabular-nums">{post.repliesCount}</span>
                     </button>
                   </div>
@@ -399,9 +401,9 @@ export const ForumView: React.FC<ForumViewProps> = ({
                       aria-label="Share post"
                     >
                       {isCopied ? (
-                        <Check className="w-4 h-4 text-[#00E676]" />
+                        <Check className="w-4 h-4 text-slate-200" />
                       ) : (
-                        <Share2 className="w-4 h-4" />
+                        <Share2 className="w-4 h-4 text-slate-200" />
                       )}
                       <span className="font-mono tabular-nums">
                         {isCopied ? 'Copied' : post.sharesCount}
@@ -414,14 +416,15 @@ export const ForumView: React.FC<ForumViewProps> = ({
                         triggerHaptic('selection');
                         setBookmarkedIds((prev) => ({ ...prev, [post.id]: !prev[post.id] }));
                       }}
-                      className={`min-h-[36px] min-w-[36px] rounded-lg flex items-center justify-center transition-colors ${
+                      aria-pressed={isSaved}
+                      className={`min-h-[36px] min-w-[36px] rounded-lg flex items-center justify-center transition-colors border ${
                         isSaved
-                          ? 'text-[#00E676] bg-emerald-500/10'
-                          : 'hover:bg-white/[0.05] hover:text-white'
+                          ? 'bg-white/[0.12] border-white/25'
+                          : 'border-transparent hover:bg-white/[0.05]'
                       }`}
                       aria-label={isSaved ? 'Remove bookmark' : 'Bookmark post'}
                     >
-                      <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+                      <Bookmark className={`w-4 h-4 text-slate-200 ${isSaved ? 'fill-slate-200' : ''}`} />
                     </button>
                   </div>
                 </div>
@@ -466,14 +469,14 @@ export const ForumView: React.FC<ForumViewProps> = ({
                     htmlFor="tag-entity-select"
                     className="text-xs font-semibold text-slate-300 flex items-center gap-1.5"
                   >
-                    <AtSign className="w-3.5 h-3.5 text-[#00E676]" />
+                    <AtSign className="w-3.5 h-3.5 text-slate-200" />
                     <span>Tag Official or Agency</span>
                   </label>
                   <select
                     id="tag-entity-select"
                     value={selectedEntityId}
                     onChange={(e) => setSelectedEntityId(e.target.value)}
-                    className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl bg-[#12151E] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-[#00E676]"
+                    className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl bg-[#12151E] border border-white/[0.1] text-xs text-white focus:outline-none focus:border-white/40"
                   >
                     <optgroup label="Public Officials">
                       {OFFICIALS.map((o) => (
@@ -499,13 +502,13 @@ export const ForumView: React.FC<ForumViewProps> = ({
                       triggerHaptic('selection');
                       setVoteAction('uprated');
                     }}
-                    className={`min-h-[44px] py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
+                    className={`min-h-[44px] py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors border ${
                       voteAction === 'uprated'
-                        ? 'bg-emerald-500/20 text-[#00E676] border border-emerald-500/40'
-                        : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/[0.06]'
+                        ? 'bg-white/[0.14] text-white border-white/30'
+                        : 'bg-white/[0.04] text-slate-400 hover:text-white border-white/[0.06]'
                     }`}
                   >
-                    <ArrowBigUp className="w-4 h-4 fill-current" />
+                    <ArrowBigUp className="w-4 h-4 text-slate-200 fill-slate-200" />
                     <span>Uprate (+1)</span>
                   </button>
 
@@ -515,13 +518,13 @@ export const ForumView: React.FC<ForumViewProps> = ({
                       triggerHaptic('selection');
                       setVoteAction('downrated');
                     }}
-                    className={`min-h-[44px] py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
+                    className={`min-h-[44px] py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors border ${
                       voteAction === 'downrated'
-                        ? 'bg-red-500/20 text-red-400 border border-red-500/40'
-                        : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/[0.06]'
+                        ? 'bg-white/[0.14] text-white border-white/30'
+                        : 'bg-white/[0.04] text-slate-400 hover:text-white border-white/[0.06]'
                     }`}
                   >
-                    <ArrowBigDown className="w-4 h-4 fill-current" />
+                    <ArrowBigDown className="w-4 h-4 text-slate-200 fill-slate-200" />
                     <span>Downrate (-1)</span>
                   </button>
                 </div>
@@ -537,7 +540,7 @@ export const ForumView: React.FC<ForumViewProps> = ({
                     onChange={(e) => setNewContent(e.target.value)}
                     placeholder="Share on-the-ground reality, policy feedback, or evidence..."
                     maxLength={320}
-                    className="w-full p-3.5 rounded-2xl bg-[#12151E] border border-white/[0.1] text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#00E676]"
+                    className="w-full p-3.5 rounded-2xl bg-[#12151E] border border-white/[0.1] text-sm text-white placeholder-slate-400 focus:outline-none focus:border-white/40"
                   />
                   <div className="flex justify-between text-[11px] text-slate-400 font-mono tabular-nums">
                     <span>Zero-Knowledge Signed</span>
@@ -567,7 +570,7 @@ export const ForumView: React.FC<ForumViewProps> = ({
 
                 <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#12151E] border border-white/[0.06]">
                   <div className="flex items-center gap-2.5">
-                    <Lock className="w-4 h-4 text-[#00E676]" />
+                    <Lock className="w-4 h-4 text-slate-200" />
                     <div>
                       <span className="text-xs font-semibold text-white block">Post Anonymously</span>
                       <span className="text-[11px] text-slate-400">Unlinks phone and handle</span>
@@ -583,7 +586,7 @@ export const ForumView: React.FC<ForumViewProps> = ({
                       setIsAnonymous((v) => !v);
                     }}
                     className={`w-11 h-6 rounded-full transition-colors relative ${
-                      isAnonymous ? 'bg-[#00E676]' : 'bg-slate-700'
+                      isAnonymous ? 'bg-white' : 'bg-slate-700'
                     }`}
                   >
                     <span
@@ -597,7 +600,7 @@ export const ForumView: React.FC<ForumViewProps> = ({
                 <button
                   type="submit"
                   disabled={!newContent.trim()}
-                  className="w-full min-h-[48px] py-3 rounded-2xl bg-[#00E676] text-black font-bold text-sm hover:bg-[#00cf6a] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full min-h-[48px] py-3 rounded-2xl bg-white text-black font-bold text-sm hover:bg-slate-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <Send className="w-4 h-4" />
                   <span>Publish to Ledger</span>
@@ -662,7 +665,7 @@ export const ForumView: React.FC<ForumViewProps> = ({
                             <div className="flex items-center gap-1.5">
                               <span className="font-bold text-white">{reply.author}</span>
                               {reply.isVerified && (
-                                <ShieldCheck className="w-3 h-3 text-[#00E676]" />
+                                <ShieldCheck className="w-3 h-3 text-slate-200" />
                               )}
                               <span className="text-slate-400">· {reply.state}</span>
                             </div>
@@ -691,13 +694,13 @@ export const ForumView: React.FC<ForumViewProps> = ({
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
                   placeholder="Write an anonymous reply..."
-                  className="flex-1 min-h-[44px] px-4 py-2 rounded-xl bg-[#12151E] border border-white/[0.1] text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#00E676]"
+                  className="flex-1 min-h-[44px] px-4 py-2 rounded-xl bg-[#12151E] border border-white/[0.1] text-sm text-white placeholder-slate-400 focus:outline-none focus:border-white/40"
                 />
                 <button
                   type="submit"
                   disabled={!replyContent.trim()}
                   aria-label="Send reply"
-                  className="min-h-[44px] px-4 rounded-xl bg-[#00E676] text-black font-bold text-xs disabled:opacity-50 flex items-center justify-center"
+                  className="min-h-[44px] px-4 rounded-xl bg-white hover:bg-slate-200 text-black font-bold text-xs disabled:opacity-50 flex items-center justify-center"
                 >
                   <Send className="w-4 h-4" />
                 </button>

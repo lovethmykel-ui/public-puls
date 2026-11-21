@@ -84,7 +84,7 @@ export const ElectionsView: React.FC = () => {
             >
               {tab}
               {isActive && (
-                <span className="absolute inset-x-4 bottom-0 h-0.5 bg-[#00E676] rounded-full" />
+                <span className="absolute inset-x-4 bottom-0 h-0.5 bg-white rounded-full" />
               )}
             </button>
           );
@@ -103,7 +103,7 @@ export const ElectionsView: React.FC = () => {
                 <div>
                   <div className="text-xs text-slate-400">
                     {election.dateStr} · Confidence{' '}
-                    <span className="text-[#00E676] font-mono font-semibold tabular-nums">
+                    <span className="text-white font-mono font-semibold tabular-nums">
                       {election.confidence}%
                     </span>
                   </div>
@@ -111,11 +111,11 @@ export const ElectionsView: React.FC = () => {
                     {election.title}
                   </h2>
                   <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-[#00E676]" />
+                    <MapPin className="w-3.5 h-3.5 text-slate-200" />
                     <span>{election.location}</span>
                   </p>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center text-slate-300 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-white/[0.06] flex items-center justify-center text-slate-200 shrink-0">
                   <Vote className="w-5 h-5" />
                 </div>
               </div>
@@ -150,7 +150,7 @@ export const ElectionsView: React.FC = () => {
 
               {/* Candidate Forecast Bars */}
               <div className="space-y-3 pt-2 border-t border-white/[0.06]">
-                {election.candidates.map((cand) => (
+                {election.candidates.map((cand, candIdx) => (
                   <div key={cand.name} className="space-y-1.5">
                     <div className="flex items-center justify-between gap-2 text-xs">
                       <div className="flex items-center gap-2.5 min-w-0">
@@ -176,11 +176,16 @@ export const ElectionsView: React.FC = () => {
                     </div>
                     <div className="h-1.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
                       <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${cand.percentage}%`,
-                          backgroundColor: cand.partyColor,
-                        }}
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          candIdx === 0
+                            ? 'bg-white'
+                            : candIdx === 1
+                            ? 'bg-slate-300/75'
+                            : candIdx === 2
+                            ? 'bg-slate-400/55'
+                            : 'bg-slate-500/45'
+                        }`}
+                        style={{ width: `${cand.percentage}%` }}
                       />
                     </div>
                   </div>
@@ -196,7 +201,7 @@ export const ElectionsView: React.FC = () => {
             <h2 className="text-base font-bold text-white font-['Outfit']">
               Geopolitical Sentiment
             </h2>
-            <span className="text-xs text-[#00E676] font-semibold">Live Polling</span>
+            <span className="text-xs text-slate-300 font-semibold">Live Polling</span>
           </div>
 
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
@@ -238,10 +243,10 @@ export const ElectionsView: React.FC = () => {
                   <div
                     className={`text-sm font-bold font-mono tabular-nums ${
                       state.sentimentScore >= 70
-                        ? 'text-[#00E676]'
+                        ? 'text-white'
                         : state.sentimentScore >= 60
-                        ? 'text-amber-400'
-                        : 'text-slate-300'
+                        ? 'text-slate-200'
+                        : 'text-slate-400'
                     }`}
                   >
                     {state.sentimentScore}%

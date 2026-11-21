@@ -88,26 +88,27 @@ export const AgencyModal: React.FC<AgencyModalProps> = ({
                   triggerHaptic('selection');
                   onToggleBookmark?.(agency.id);
                 }}
+                aria-pressed={isBookmarked}
                 aria-label={isBookmarked ? 'Remove agency bookmark' : 'Bookmark agency'}
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors border ${
                   isBookmarked
-                    ? 'bg-blue-500/20 text-blue-400'
-                    : 'bg-white/[0.06] text-slate-300 hover:text-white'
+                    ? 'bg-white/[0.15] border-white/30 text-slate-200'
+                    : 'bg-white/[0.06] border-transparent text-slate-200 hover:bg-white/[0.1]'
                 }`}
               >
-                <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
+                <Bookmark className={`w-4 h-4 text-slate-200 ${isBookmarked ? 'fill-slate-200' : ''}`} />
               </button>
 
               <button
                 type="button"
                 onClick={handleShare}
                 aria-label="Share agency profile"
-                className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-slate-300 hover:text-white"
+                className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-slate-200 hover:bg-white/[0.1]"
               >
                 {copiedShare ? (
-                  <Check className="w-4 h-4 text-[#00E676]" />
+                  <Check className="w-4 h-4 text-slate-200" />
                 ) : (
-                  <Share2 className="w-4 h-4" />
+                  <Share2 className="w-4 h-4 text-slate-200" />
                 )}
               </button>
             </div>
@@ -152,7 +153,7 @@ export const AgencyModal: React.FC<AgencyModalProps> = ({
                   >
                     {tab}
                     {isActive && (
-                      <span className="absolute inset-x-3 bottom-0 h-0.5 bg-[#00E676] rounded-full" />
+                      <span className="absolute inset-x-3 bottom-0 h-0.5 bg-white rounded-full" />
                     )}
                   </button>
                 );
@@ -175,13 +176,13 @@ export const AgencyModal: React.FC<AgencyModalProps> = ({
 
                     <div
                       className={`flex items-center gap-1 text-xs font-bold font-mono tabular-nums ${
-                        isPositive ? 'text-[#00E676]' : 'text-red-400'
+                        isPositive ? 'text-white' : 'text-slate-400'
                       }`}
                     >
                       {isPositive ? (
-                        <ArrowUpRight className="w-3.5 h-3.5" />
+                        <ArrowUpRight className="w-3.5 h-3.5 text-slate-200" />
                       ) : (
-                        <ArrowDownRight className="w-3.5 h-3.5" />
+                        <ArrowDownRight className="w-3.5 h-3.5 text-slate-200" />
                       )}
                       <span>{isPositive ? `+${agency.change7d}% 7D` : `${agency.change7d}% 7D`}</span>
                     </div>
@@ -243,7 +244,7 @@ export const AgencyModal: React.FC<AgencyModalProps> = ({
                     </div>
                     <div className="h-1.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-[#00E676] rounded-full"
+                        className="h-full bg-white/85 rounded-full"
                         style={{ width: `${item.score}%` }}
                       />
                     </div>
@@ -259,12 +260,12 @@ export const AgencyModal: React.FC<AgencyModalProps> = ({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5 text-xs">
                         <span className="font-bold text-white">{rev.author}</span>
-                        <ShieldCheck className="w-3.5 h-3.5 text-[#00E676]" />
+                        <ShieldCheck className="w-3.5 h-3.5 text-slate-200" />
                         <span className="text-slate-400">· {rev.state}</span>
                       </div>
-                      <div className="flex items-center text-amber-400">
+                      <div className="flex items-center text-slate-200">
                         {Array.from({ length: rev.rating }).map((_, i) => (
-                          <Star key={i} className="w-3 h-3 fill-amber-400" />
+                          <Star key={i} className="w-3 h-3 text-slate-200 fill-slate-200" />
                         ))}
                       </div>
                     </div>
@@ -272,7 +273,7 @@ export const AgencyModal: React.FC<AgencyModalProps> = ({
                     <div className="flex items-center justify-between text-[11px] text-slate-400">
                       <span>{rev.timeAgo}</span>
                       <span className="inline-flex items-center gap-1">
-                        <ThumbsUp className="w-3 h-3" />
+                        <ThumbsUp className="w-3 h-3 text-slate-200" />
                         {rev.upvotes}
                       </span>
                     </div>
@@ -289,7 +290,7 @@ export const AgencyModal: React.FC<AgencyModalProps> = ({
                 triggerHaptic('medium');
                 onRate(agency);
               }}
-              className="w-full min-h-[48px] py-3 rounded-2xl bg-[#00E676] hover:bg-[#00cf6a] text-black font-bold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              className="w-full min-h-[48px] py-3 rounded-2xl bg-white hover:bg-slate-200 text-black font-bold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
               <Star className="w-4 h-4 fill-black" />
               <span>Audit &amp; Rate Institution</span>

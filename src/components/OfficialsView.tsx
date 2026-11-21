@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   ShieldCheck,
@@ -16,6 +16,8 @@ import { triggerHaptic } from '../utils/telegram';
 interface OfficialsViewProps {
   officials: Official[];
   agencies: Agency[];
+  externalSearchQuery?: string;
+  onExternalSearchConsumed?: () => void;
   onVoteOfficial: (officialId: string, direction: 'up' | 'down') => void;
   onVoteAgency: (agencyId: string, direction: 'up' | 'down') => void;
   onSelectOfficial: (official: Official) => void;
@@ -28,6 +30,8 @@ type LeaderboardSegment = 'officials' | 'agencies' | 'all';
 export const OfficialsView: React.FC<OfficialsViewProps> = ({
   officials,
   agencies,
+  externalSearchQuery,
+  onExternalSearchConsumed,
   onVoteOfficial,
   onVoteAgency,
   onSelectOfficial,
@@ -38,6 +42,15 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
   const [categoryFilter, setCategoryFilter] = useState<OfficialFilter>('all');
   const [sortBy, setSortBy] = useState<'score' | 'movers'>('score');
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    if (externalSearchQuery && externalSearchQuery.trim()) {
+      setSearchQuery(externalSearchQuery);
+      setSegment('all');
+      setCategoryFilter('all');
+      onExternalSearchConsumed?.();
+    }
+  }, [externalSearchQuery, onExternalSearchConsumed]);
 
   const effectiveOfficialFilter: OfficialFilter =
     segment === 'agencies' ? 'agencies' : categoryFilter;
@@ -90,10 +103,10 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
 
     const badgeColor =
       rank === 1
-        ? 'bg-amber-400 text-black'
+        ? 'bg-white text-black'
         : rank === 2
         ? 'bg-slate-300 text-black'
-        : 'bg-amber-700 text-white';
+        : 'bg-slate-600 text-white';
 
     return (
       <button
@@ -112,7 +125,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
           <div
             className={`rounded-full overflow-hidden flex items-center justify-center ring-2 transition-transform group-hover:scale-105 ${
               rank === 1
-                ? 'w-20 h-20 sm:w-24 sm:h-24 ring-[#00E676]/70'
+                ? 'w-20 h-20 sm:w-24 sm:h-24 ring-white/60'
                 : 'w-16 h-16 sm:w-20 sm:h-20 ring-white/15'
             } ${!isOfficial ? 'bg-white p-2' : 'bg-[#151A25]'}`}
           >
@@ -134,7 +147,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
           {name}
         </span>
         <span className="text-[11px] text-slate-400 truncate max-w-[110px]">{sub}</span>
-        <span className="mt-1 text-xs font-bold font-mono tabular-nums text-[#00E676]">
+        <span className="mt-1 text-xs font-bold font-mono tabular-nums text-slate-200">
           {entry.score.toFixed(1)}/100
         </span>
       </button>
@@ -178,7 +191,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
             >
               {tab.label}
               {isActive && (
-                <span className="absolute inset-x-4 bottom-0 h-0.5 bg-[#00E676] rounded-full" />
+                <span className="absolute inset-x-4 bottom-0 h-0.5 bg-white rounded-full" />
               )}
             </button>
           );
@@ -188,21 +201,21 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
       {/* Search + Filters Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-200" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search official, state, ministry, or agency..."
             aria-label="Search officials and agencies"
-            className="w-full min-h-[44px] pl-10 pr-9 py-2 rounded-xl bg-[#12151E] border border-white/[0.08] text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#00E676]/60 transition-colors"
+            className="w-full min-h-[44px] pl-10 pr-9 py-2 rounded-xl bg-[#12151E] border border-white/[0.08] text-sm text-white placeholder-slate-400 focus:outline-none focus:border-white/30 transition-colors"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery('')}
               aria-label="Clear search"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-white"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-slate-200 hover:text-white"
             >
               <X className="w-4 h-4" />
             </button>
@@ -245,7 +258,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
         </div>
       </div>
 
-      {/* Top 3 Podium Showcase (DOGS NFT Leaderboard Pattern) */}
+      {/* Top 3 Podium Showcase */}
       {showPodium && (
         <section
           aria-label="Top 3 ranked leaders"
@@ -253,7 +266,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
         >
           <div
             aria-hidden="true"
-            className="absolute inset-x-0 top-0 h-32 bg-[radial-gradient(ellipse_at_top,rgba(0,230,118,0.14),transparent_70%)] pointer-events-none"
+            className="absolute inset-x-0 top-0 h-32 bg-[radial-gradient(ellipse_at_top,rgba(226,232,240,0.09),transparent_70%)] pointer-events-none"
           />
           <div className="relative z-10 grid grid-cols-3 gap-2 items-end max-w-lg mx-auto">
             {renderPodiumCard(podiumTop3[1], 2)}
@@ -263,10 +276,10 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
         </section>
       )}
 
-      {/* Summary Benchmark Card (fomo "Your rank" strip) */}
+      {/* Summary Benchmark Card */}
       <div className="surface-card rounded-2xl px-4 py-3.5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#00E676]/15 text-[#00E676] flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-white/[0.07] text-slate-200 flex items-center justify-center shrink-0">
             <Trophy className="w-5 h-5" />
           </div>
           <div>
@@ -277,7 +290,7 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
           </div>
         </div>
         <div className="text-right">
-          <div className="text-lg font-bold text-[#00E676] font-mono tabular-nums">
+          <div className="text-lg font-bold text-white font-mono tabular-nums">
             {avgTrust}/100
           </div>
           <div className="text-[11px] text-slate-400">Citizen Consensus</div>
@@ -349,11 +362,11 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-sm font-semibold text-white truncate group-hover:text-[#00E676] transition-colors">
+                        <span className="text-sm font-semibold text-white truncate group-hover:text-slate-200 transition-colors">
                           {name}
                         </span>
                         {isOfficial && (
-                          <ShieldCheck className="w-3.5 h-3.5 text-[#00E676] shrink-0" />
+                          <ShieldCheck className="w-3.5 h-3.5 text-slate-200 shrink-0" />
                         )}
                       </div>
                       <p className="text-xs text-slate-400 truncate mt-0.5">{subtitle}</p>
@@ -388,10 +401,11 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                       }}
                       className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors active:scale-95 ${
                         entry.item.userVote === 'up'
-                          ? 'bg-[#00E676] text-black'
-                          : 'bg-white/[0.05] text-slate-400 hover:text-[#00E676] hover:bg-white/[0.1]'
+                          ? 'bg-white text-black'
+                          : 'bg-white/[0.05] text-slate-200 hover:bg-white/[0.12]'
                       }`}
                       aria-label={`Uprate ${name}`}
+                      aria-pressed={entry.item.userVote === 'up'}
                     >
                       <ArrowBigUp className="w-4 h-4 fill-current" />
                     </button>
@@ -404,10 +418,11 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                       }}
                       className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors active:scale-95 ${
                         entry.item.userVote === 'down'
-                          ? 'bg-red-500 text-white'
-                          : 'bg-white/[0.05] text-slate-400 hover:text-red-400 hover:bg-white/[0.1]'
+                          ? 'bg-white/[0.22] border border-white/40 text-white'
+                          : 'bg-white/[0.05] text-slate-200 hover:bg-white/[0.12]'
                       }`}
                       aria-label={`Downrate ${name}`}
+                      aria-pressed={entry.item.userVote === 'down'}
                     >
                       <ArrowBigDown className="w-4 h-4 fill-current" />
                     </button>
@@ -419,13 +434,13 @@ export const OfficialsView: React.FC<OfficialsViewProps> = ({
                     </div>
                     <div
                       className={`text-[11px] font-semibold font-mono tabular-nums flex items-center justify-end gap-0.5 ${
-                        isPositive ? 'text-[#00E676]' : 'text-red-400'
+                        isPositive ? 'text-slate-200' : 'text-slate-400'
                       }`}
                     >
                       {isPositive ? (
-                        <ArrowUpRight className="w-3 h-3" />
+                        <ArrowUpRight className="w-3 h-3 text-slate-200" />
                       ) : (
-                        <ArrowDownRight className="w-3 h-3" />
+                        <ArrowDownRight className="w-3 h-3 text-slate-200" />
                       )}
                       <span>{isPositive ? `+${entry.change}%` : `${entry.change}%`}</span>
                     </div>

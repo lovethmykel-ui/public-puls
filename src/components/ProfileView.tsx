@@ -90,7 +90,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           aria-label="Share citizen profile"
           className="w-10 h-10 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] flex items-center justify-center text-slate-200 transition-colors"
         >
-          {copiedShare ? <Check className="w-4 h-4 text-[#00E676]" /> : <Share2 className="w-4 h-4" />}
+          {copiedShare ? <Check className="w-4 h-4 text-slate-200" /> : <Share2 className="w-4 h-4 text-slate-200" />}
         </button>
         <button
           type="button"
@@ -127,7 +127,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover ring-2 ring-white/15"
             />
             {isVerified && (
-              <span className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-[#00E676] text-black flex items-center justify-center ring-2 ring-[#08090C]">
+              <span className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-white text-black flex items-center justify-center ring-2 ring-[#08090C]">
                 <ShieldCheck className="w-3.5 h-3.5" />
               </span>
             )}
@@ -139,7 +139,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               triggerHaptic('selection');
               onOpenVerification();
             }}
-            className="min-h-[40px] px-4 py-2 rounded-xl bg-[#00E676] hover:bg-[#00cf6a] text-black text-xs font-bold flex items-center gap-1.5 transition-colors whitespace-nowrap"
+            className="min-h-[40px] px-4 py-2 rounded-xl bg-white hover:bg-slate-200 text-black text-xs font-bold flex items-center gap-1.5 transition-colors whitespace-nowrap"
           >
             <ShieldCheck className="w-4 h-4" />
             <span>{isVerified ? 'ZK Credential' : 'Verify ID'}</span>
@@ -168,11 +168,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 onChange={(e) => setBioDraft(e.target.value)}
                 placeholder="Write a short civic bio..."
                 maxLength={90}
-                className="flex-1 min-h-[38px] px-3 py-1.5 rounded-xl bg-[#12151E] border border-white/[0.12] text-xs text-white focus:outline-none focus:border-[#00E676]"
+                className="flex-1 min-h-[38px] px-3 py-1.5 rounded-xl bg-[#12151E] border border-white/[0.12] text-xs text-white focus:outline-none focus:border-white/40"
               />
               <button
                 type="submit"
-                className="min-h-[38px] px-3 rounded-xl bg-[#00E676] text-black text-xs font-bold"
+                className="min-h-[38px] px-3 rounded-xl bg-white hover:bg-slate-200 text-black text-xs font-bold"
               >
                 Save
               </button>
@@ -184,9 +184,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 setBioDraft(bio);
                 setIsEditingBio(true);
               }}
-              className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-[#00E676] hover:underline"
+              className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-slate-200 hover:text-white hover:underline"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3.5 h-3.5 text-slate-200" />
               <span>{bio || 'Add a civic bio'}</span>
             </button>
           )}
@@ -208,15 +208,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
             <span className="inline-flex items-center gap-1">
-              <Award className="w-3.5 h-3.5" />
+              <Award className="w-3.5 h-3.5 text-slate-200" />
               43 Reviews
             </span>
             <span className="inline-flex items-center gap-1">
-              <MessageSquare className="w-3.5 h-3.5" />
+              <MessageSquare className="w-3.5 h-3.5 text-slate-200" />
               100% Voting Weight
             </span>
             <span className="inline-flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5" />
+              <Calendar className="w-3.5 h-3.5 text-slate-200" />
               Joined May 2025
             </span>
           </div>
@@ -231,7 +231,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               8,420
               <span className="text-xl text-slate-500 font-semibold">.00</span>
             </div>
-            <div className="text-xs font-semibold text-[#00E676] font-mono tabular-nums mt-0.5">
+            <div className="text-xs font-semibold text-slate-200 font-mono tabular-nums mt-0.5">
               {series.delta} <span className="text-slate-400 font-sans font-normal">Influence</span>
             </div>
           </div>
@@ -262,7 +262,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             data={series.data}
             width={560}
             height={110}
-            color="#00E676"
+            color="#E2E8F0"
             strokeWidth={2.5}
             showGradient={true}
             showDot={true}
@@ -271,10 +271,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         </div>
       </section>
 
-      {/* Single Elevated Voting Power Strip (fomo "Cash balance" strip) */}
+      {/* Single Elevated Voting Power Strip */}
       <div className="surface-card rounded-2xl p-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-[#00E676] shrink-0">
+          <div className="w-11 h-11 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-slate-200 shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
@@ -358,7 +358,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                         </div>
                       </div>
                     </div>
-                    <span className="text-xs font-mono font-bold text-[#00E676] tabular-nums shrink-0">
+                    <span className="text-xs font-mono font-bold text-slate-100 tabular-nums shrink-0">
                       {item.trustIndex.toFixed(1)}/100
                     </span>
                   </button>
@@ -412,7 +412,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   className="w-full min-h-[56px] px-4 py-3 flex items-center justify-between gap-3 text-left hover:bg-white/[0.03] transition-colors first:rounded-t-2xl last:rounded-b-2xl"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-white/[0.05] flex items-center justify-center text-slate-300 shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-white/[0.05] flex items-center justify-center text-slate-200 shrink-0">
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
@@ -420,7 +420,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                       <div className="text-xs text-slate-400 truncate">{row.meta}</div>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-500 shrink-0" />
+                  <ChevronRight className="w-4 h-4 text-slate-200 shrink-0" />
                 </button>
               );
             })}
@@ -486,7 +486,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                             </div>
                             <span
                               className={`text-xs font-bold ${
-                                o.userVote === 'up' ? 'text-[#00E676]' : 'text-red-400'
+                                o.userVote === 'up' ? 'text-white' : 'text-slate-400'
                               }`}
                             >
                               {o.userVote === 'up' ? 'Uprated' : 'Downrated'}
@@ -509,7 +509,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                             </div>
                             <span
                               className={`text-xs font-bold ${
-                                a.userVote === 'up' ? 'text-[#00E676]' : 'text-red-400'
+                                a.userVote === 'up' ? 'text-white' : 'text-slate-400'
                               }`}
                             >
                               {a.userVote === 'up' ? 'Uprated' : 'Downrated'}
@@ -544,7 +544,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                             <div className="text-xs text-slate-400">{o.party} · {o.state}</div>
                           </div>
                         </div>
-                        <span className="text-xs font-mono font-bold text-[#00E676] tabular-nums">
+                        <span className="text-xs font-mono font-bold text-slate-100 tabular-nums">
                           {o.trustIndex.toFixed(1)}
                         </span>
                       </button>
@@ -561,7 +561,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                     ].map((tx) => (
                       <div key={tx.hash} className="surface-card rounded-xl p-3 space-y-1">
                         <div className="flex items-center justify-between">
-                          <span className="font-mono text-[#00E676]">{tx.hash}</span>
+                          <span className="font-mono text-slate-200">{tx.hash}</span>
                           <span className="text-slate-400">{tx.time}</span>
                         </div>
                         <div className="text-slate-200 font-medium">{tx.action}</div>

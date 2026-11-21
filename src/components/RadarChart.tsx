@@ -18,7 +18,7 @@ interface RadarChartProps {
 export const RadarChart: React.FC<RadarChartProps> = ({
   data,
   size = 240,
-  color = '#00E676',
+  color = '#E2E8F0',
 }) => {
   const axes = [
     { key: 'economy', label: 'Economy', val: data.economy },
@@ -58,7 +58,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       <svg width={size} height={size} className="overflow-visible">
         <defs>
           <radialGradient id="radar-glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor={color} stopOpacity={0.25} />
+            <stop offset="0%" stopColor={color} stopOpacity={0.22} />
             <stop offset="100%" stopColor={color} stopOpacity={0.0} />
           </radialGradient>
         </defs>
@@ -140,7 +140,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
               className="text-[11px] font-medium fill-slate-400"
             >
               {axis.label}
-              <tspan className="text-[10px] font-semibold fill-[#00E676] ml-1">
+              <tspan className="text-[10px] font-semibold fill-slate-100 ml-1">
                 {` ${Math.round(axis.val)}%`}
               </tspan>
             </text>

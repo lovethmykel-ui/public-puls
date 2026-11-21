@@ -21,7 +21,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, onChangeTab }
   return (
     <nav
       aria-label="Mobile navigation"
-      className="md:hidden fixed bottom-3 left-3 right-3 z-40 max-w-md mx-auto pointer-events-none safe-bottom"
+      className="lg:hidden fixed bottom-3 left-3 right-3 z-30 max-w-md mx-auto pointer-events-none safe-bottom"
     >
       <div className="pointer-events-auto dock-glass rounded-full p-1.5 grid grid-cols-5 items-center gap-1">
         {TABS.map((tab) => {
@@ -37,18 +37,18 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, onChangeTab }
               }}
               aria-label={tab.label}
               aria-current={isActive ? 'page' : undefined}
-              className="relative min-h-[46px] rounded-full flex flex-col items-center justify-center gap-0.5 transition-colors active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E676]/60"
+              className="relative min-h-[44px] rounded-full flex flex-col items-center justify-center gap-0.5 transition-colors active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
             >
               {isActive && (
                 <motion.div
                   layoutId="mobileNavCapsule"
-                  className="absolute inset-0 rounded-full bg-white/[0.11]"
+                  className="absolute inset-0 rounded-full bg-white/[0.12]"
                   transition={{ type: 'spring', stiffness: 420, damping: 32 }}
                 />
               )}
               <Icon
-                className={`relative z-10 w-[19px] h-[19px] transition-colors ${
-                  isActive ? 'text-white' : 'text-slate-400'
+                className={`relative z-10 w-[18px] h-[18px] transition-opacity ${
+                  isActive ? 'text-slate-200 opacity-100' : 'text-slate-200 opacity-50'
                 }`}
               />
               <span

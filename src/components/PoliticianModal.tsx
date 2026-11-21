@@ -97,26 +97,27 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                   triggerHaptic('selection');
                   onToggleBookmark?.(official.id);
                 }}
+                aria-pressed={isBookmarked}
                 aria-label={isBookmarked ? 'Remove from watchlist' : 'Save to watchlist'}
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors border ${
                   isBookmarked
-                    ? 'bg-[#00E676]/20 text-[#00E676]'
-                    : 'bg-white/[0.06] text-slate-300 hover:text-white'
+                    ? 'bg-white/[0.15] border-white/30 text-slate-200'
+                    : 'bg-white/[0.06] border-transparent text-slate-200 hover:bg-white/[0.1]'
                 }`}
               >
-                <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
+                <Bookmark className={`w-4 h-4 text-slate-200 ${isBookmarked ? 'fill-slate-200' : ''}`} />
               </button>
 
               <button
                 type="button"
                 onClick={handleShare}
                 aria-label="Share official profile"
-                className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-slate-300 hover:text-white"
+                className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-slate-200 hover:bg-white/[0.1]"
               >
                 {copiedShare ? (
-                  <Check className="w-4 h-4 text-[#00E676]" />
+                  <Check className="w-4 h-4 text-slate-200" />
                 ) : (
-                  <Share2 className="w-4 h-4" />
+                  <Share2 className="w-4 h-4 text-slate-200" />
                 )}
               </button>
             </div>
@@ -131,12 +132,7 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                   src={official.avatar}
                   alt={official.name}
                   referrerPolicy="no-referrer"
-                  className="w-16 h-16 rounded-full object-cover ring-2 ring-white/15"
-                />
-                <span
-                  aria-hidden="true"
-                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full ring-2 ring-[#0C0F17]"
-                  style={{ backgroundColor: official.partyColor }}
+                  className="w-16 h-16 rounded-full object-cover ring-2 ring-white/20"
                 />
               </div>
 
@@ -145,11 +141,11 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                   <h3 className="text-lg font-bold text-white tracking-tight font-['Outfit'] truncate">
                     {official.name}
                   </h3>
-                  <ShieldCheck className="w-4 h-4 text-[#00E676] shrink-0" />
+                  <ShieldCheck className="w-4 h-4 text-slate-200 shrink-0" />
                 </div>
                 <p className="text-xs text-slate-300 mt-0.5">{official.role}</p>
                 <div className="flex items-center gap-2 mt-1 text-xs text-slate-400">
-                  <Calendar className="w-3 h-3 shrink-0" />
+                  <Calendar className="w-3 h-3 shrink-0 text-slate-200" />
                   <span>
                     {official.party} · {official.assumedOffice}
                   </span>
@@ -175,7 +171,7 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                   >
                     {tab}
                     {isActive && (
-                      <span className="absolute inset-x-3 bottom-0 h-0.5 bg-[#00E676] rounded-full" />
+                      <span className="absolute inset-x-3 bottom-0 h-0.5 bg-white rounded-full" />
                     )}
                   </button>
                 );
@@ -198,13 +194,13 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
 
                     <div
                       className={`flex items-center gap-1 text-xs font-bold font-mono tabular-nums ${
-                        isPositive ? 'text-[#00E676]' : 'text-red-400'
+                        isPositive ? 'text-white' : 'text-slate-400'
                       }`}
                     >
                       {isPositive ? (
-                        <ArrowUpRight className="w-3.5 h-3.5" />
+                        <ArrowUpRight className="w-3.5 h-3.5 text-slate-200" />
                       ) : (
-                        <ArrowDownRight className="w-3.5 h-3.5" />
+                        <ArrowDownRight className="w-3.5 h-3.5 text-slate-200" />
                       )}
                       <span>{isPositive ? `+${official.change7d}% 7D` : `${official.change7d}% 7D`}</span>
                     </div>
@@ -256,20 +252,20 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="p-2.5 rounded-xl bg-emerald-500/10">
-                      <div className="text-base font-bold text-[#00E676] font-mono tabular-nums">
+                    <div className="p-2.5 rounded-xl bg-white/[0.08] border border-white/[0.1]">
+                      <div className="text-base font-bold text-white font-mono tabular-nums">
                         {official.approval.positive}%
                       </div>
                       <div className="text-[11px] text-slate-400">Positive</div>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-amber-500/10">
-                      <div className="text-base font-bold text-amber-400 font-mono tabular-nums">
+                    <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06]">
+                      <div className="text-base font-bold text-slate-200 font-mono tabular-nums">
                         {official.approval.neutral}%
                       </div>
                       <div className="text-[11px] text-slate-400">Neutral</div>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-red-500/10">
-                      <div className="text-base font-bold text-red-400 font-mono tabular-nums">
+                    <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+                      <div className="text-base font-bold text-slate-400 font-mono tabular-nums">
                         {official.approval.negative}%
                       </div>
                       <div className="text-[11px] text-slate-400">Negative</div>
@@ -285,14 +281,15 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                       triggerHaptic('medium');
                       onVote?.(official.id, 'up');
                     }}
+                    aria-pressed={official.userVote === 'up'}
                     className={`min-h-[44px] flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all active:scale-95 ${
                       official.userVote === 'up'
-                        ? 'bg-[#00E676] border-[#00E676] text-black'
-                        : 'bg-[#12151E] border-white/[0.08] text-slate-200 hover:border-[#00E676]/50'
+                        ? 'bg-white/[0.14] border-white/35 text-white'
+                        : 'bg-[#12151E] border-white/[0.08] text-slate-200 hover:border-white/25'
                     }`}
                   >
                     <ArrowBigUp
-                      className={`w-4 h-4 ${official.userVote === 'up' ? 'fill-current' : ''}`}
+                      className={`w-4 h-4 text-slate-200 ${official.userVote === 'up' ? 'fill-slate-200' : ''}`}
                     />
                     <span className="font-mono tabular-nums">
                       Uprate ({official.upvotesCount.toLocaleString()})
@@ -305,14 +302,15 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                       triggerHaptic('medium');
                       onVote?.(official.id, 'down');
                     }}
+                    aria-pressed={official.userVote === 'down'}
                     className={`min-h-[44px] flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all active:scale-95 ${
                       official.userVote === 'down'
-                        ? 'bg-red-500 border-red-500 text-white'
-                        : 'bg-[#12151E] border-white/[0.08] text-slate-200 hover:border-red-500/50'
+                        ? 'bg-white/[0.1] border-white/25 text-white'
+                        : 'bg-[#12151E] border-white/[0.08] text-slate-200 hover:border-white/25'
                     }`}
                   >
                     <ArrowBigDown
-                      className={`w-4 h-4 ${official.userVote === 'down' ? 'fill-current' : ''}`}
+                      className={`w-4 h-4 text-slate-200 ${official.userVote === 'down' ? 'fill-slate-200' : ''}`}
                     />
                     <span className="font-mono tabular-nums">
                       Downrate ({official.downvotesCount.toLocaleString()})
@@ -329,7 +327,7 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                   <div className="pt-2 border-t border-white/[0.06] space-y-1.5">
                     {official.keyInitiatives.map((init, idx) => (
                       <div key={idx} className="flex items-center gap-2 text-xs text-slate-300">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#00E676] shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-slate-200 shrink-0" />
                         <span>{init}</span>
                       </div>
                     ))}
@@ -346,7 +344,7 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                 <p className="text-xs text-slate-400 mb-2">
                   Citizen audits across 6 core performance sectors
                 </p>
-                <RadarChart data={official.radar} size={250} color="#00E676" />
+                <RadarChart data={official.radar} size={250} color="#E2E8F0" />
               </div>
             )}
 
@@ -357,12 +355,12 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5 text-xs">
                         <span className="font-bold text-white">{rev.author}</span>
-                        <ShieldCheck className="w-3.5 h-3.5 text-[#00E676]" />
+                        <ShieldCheck className="w-3.5 h-3.5 text-slate-200" />
                         <span className="text-slate-400">· {rev.state}</span>
                       </div>
-                      <div className="flex items-center text-amber-400">
+                      <div className="flex items-center text-slate-200">
                         {Array.from({ length: rev.rating }).map((_, i) => (
-                          <Star key={i} className="w-3 h-3 fill-amber-400" />
+                          <Star key={i} className="w-3 h-3 text-slate-200 fill-slate-200" />
                         ))}
                       </div>
                     </div>
@@ -370,7 +368,7 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                     <div className="flex items-center justify-between text-[11px] text-slate-400">
                       <span>{rev.timeAgo}</span>
                       <span className="inline-flex items-center gap-1">
-                        <ThumbsUp className="w-3 h-3" />
+                        <ThumbsUp className="w-3 h-3 text-slate-200" />
                         {rev.upvotes}
                       </span>
                     </div>
@@ -388,7 +386,7 @@ export const PoliticianModal: React.FC<PoliticianModalProps> = ({
                 triggerHaptic('medium');
                 onRate(official);
               }}
-              className="w-full min-h-[48px] py-3 rounded-2xl bg-[#00E676] hover:bg-[#00cf6a] text-black font-bold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              className="w-full min-h-[48px] py-3 rounded-2xl bg-white hover:bg-slate-200 text-black font-bold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
               <Star className="w-4 h-4 fill-black" />
               <span>Audit &amp; Rate Official</span>

@@ -6,6 +6,7 @@ import {
   filterAgencies,
   filterForumPosts,
   filterOfficials,
+  searchCivicEntities,
 } from './civicMath';
 import { AGENCIES, FORUM_POSTS, OFFICIALS } from '../data/mockData';
 
@@ -73,3 +74,19 @@ test('filterForumPosts filters by voteAction and hashtag', () => {
   assert.equal(passport.length, 1);
   assert.equal(passport[0].id, 'post-1');
 });
+
+test('searchCivicEntities finds both officials and agencies by name or acronym', () => {
+  assert.deepEqual(searchCivicEntities(OFFICIALS, AGENCIES, '   '), []);
+
+  const obi = searchCivicEntities(OFFICIALS, AGENCIES, 'Obi');
+  assert.ok(obi.some((r) => r.kind === 'official' && r.id === 'peter-obi'));
+
+  const efcc = searchCivicEntities(OFFICIALS, AGENCIES, 'efcc');
+  assert.equal(efcc[0].kind, 'agency');
+  assert.equal(efcc[0].id, 'efcc');
+
+  const interior = searchCivicEntities(OFFICIALS, AGENCIES, 'Tunji');
+  assert.equal(interior[0].kind, 'official');
+  assert.equal(interior[0].id, 'tunji-ojo');
+});
+

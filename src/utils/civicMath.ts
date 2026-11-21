@@ -164,3 +164,67 @@ export function filterForumPosts(
 
   return filtered;
 }
+
+export interface GlobalSearchResult {
+  kind: 'official' | 'agency';
+  id: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  trustIndex: number;
+  change24h: number;
+}
+
+export function searchCivicEntities(
+  officials: Official[],
+  agencies: Agency[],
+  query: string,
+  limit = 8
+): GlobalSearchResult[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+
+  const matchedOfficials = officials
+    .filter(
+      (o) =>
+        o.name.toLowerCase().includes(q) ||
+        o.role.toLowerCase().includes(q) ||
+        o.state.toLowerCase().includes(q) ||
+        o.party.toLowerCase().includes(q)
+    )
+    .map((o) => ({
+      kind: 'official' as const,
+      id: o.id,
+      title: o.name,
+      subtitle: `${o.role} · ${o.state}`,
+      image: o.avatar,
+      trustIndex: o.trustIndex,
+      change24h: o.change24h,
+      rankBoost: o.name.toLowerCase().startsWith(q) ? 2 : 0,
+    }));
+
+  const matchedAgencies = agencies
+    .filter(
+      (a) =>
+        a.name.toLowerCase().includes(q) ||
+        a.acronym.toLowerCase().includes(q) ||
+        a.sector.toLowerCase().includes(q) ||
+        a.head.toLowerCase().includes(q)
+    )
+    .map((a) => ({
+      kind: 'agency' as const,
+      id: a.id,
+      title: `${a.acronym} — ${a.name}`,
+      subtitle: `${a.sector} · ${a.head}`,
+      image: a.logo,
+      trustIndex: a.trustIndex,
+      change24h: a.change24h,
+      rankBoost: a.acronym.toLowerCase().startsWith(q) || a.name.toLowerCase().startsWith(q) ? 2 : 0,
+    }));
+
+  return [...matchedOfficials, ...matchedAgencies]
+    .sort((a, b) => b.rankBoost - a.rankBoost || b.trustIndex - a.trustIndex)
+    .slice(0, limit)
+    .map(({ rankBoost: _rankBoost, ...rest }) => rest);
+}
+

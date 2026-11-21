@@ -63,7 +63,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     {NATIONAL_CONFIDENCE_INDEX.score}
                     <span className="text-2xl text-slate-500 font-semibold">%</span>
                   </h1>
-                  <span className="text-sm font-semibold text-[#00E676] tabular-nums">
+                  <span className="text-sm font-semibold text-slate-200 tabular-nums">
                     {currentSeries.delta}
                   </span>
                 </div>
@@ -100,7 +100,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 data={currentSeries.data}
                 width={560}
                 height={112}
-                color="#00E676"
+                color="#E2E8F0"
                 strokeWidth={2.5}
                 showGradient={true}
                 showDot={true}
@@ -139,7 +139,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             >
               <div
                 aria-hidden="true"
-                className="absolute right-0 top-0 bottom-0 w-48 bg-[radial-gradient(circle_at_75%_50%,rgba(0,230,118,0.22),transparent_70%)] pointer-events-none"
+                className="absolute right-0 top-0 bottom-0 w-48 bg-[radial-gradient(circle_at_75%_50%,rgba(226,232,240,0.09),transparent_70%)] pointer-events-none"
               />
               <div className="relative z-10 flex items-center justify-between gap-4">
                 <div className="max-w-sm">
@@ -150,7 +150,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     Speak truth to power, uprate performance, and audit leadership without censorship.
                   </p>
                 </div>
-                <div className="w-12 h-12 rounded-2xl bg-[#00E676]/15 border border-[#00E676]/25 text-[#00E676] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/[0.09] text-slate-200 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                   <Activity className="w-6 h-6" />
                 </div>
               </div>
@@ -165,11 +165,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               }}
               className="group relative overflow-hidden rounded-[22px] bg-[#12151E] hover:bg-[#171B26] border border-white/[0.07] p-4 sm:p-5 text-left transition-all active:scale-[0.985]"
             >
-              <div
-                aria-hidden="true"
-                className="absolute -right-6 -bottom-6 w-28 h-28 rounded-full bg-blue-500/15 blur-xl pointer-events-none"
-              />
-              <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center mb-3">
+              <div className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/[0.08] text-slate-200 flex items-center justify-center mb-3">
                 <Lock className="w-5 h-5" />
               </div>
               <h3 className="text-sm sm:text-base font-bold text-white font-['Outfit']">
@@ -189,11 +185,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               }}
               className="group relative overflow-hidden rounded-[22px] bg-[#12151E] hover:bg-[#171B26] border border-white/[0.07] p-4 sm:p-5 text-left transition-all active:scale-[0.985]"
             >
-              <div
-                aria-hidden="true"
-                className="absolute -right-6 -bottom-6 w-28 h-28 rounded-full bg-amber-500/15 blur-xl pointer-events-none"
-              />
-              <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center mb-3">
+              <div className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/[0.08] text-slate-200 flex items-center justify-center mb-3">
                 <Vote className="w-5 h-5" />
               </div>
               <h3 className="text-sm sm:text-base font-bold text-white font-['Outfit']">
@@ -219,7 +211,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <ul className="space-y-1.5 pt-2 border-t border-white/[0.06]">
               {AI_DAILY_BRIEF.bulletPoints.slice(0, 2).map((point, idx) => (
                 <li key={idx} className="text-xs text-slate-400 leading-relaxed flex gap-2">
-                  <span className="text-[#00E676] font-bold">·</span>
+                  <span className="text-slate-200 font-bold">·</span>
                   <span>{point}</span>
                 </li>
               ))}
@@ -241,10 +233,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   triggerHaptic('selection');
                   onNavigateTab('officials');
                 }}
-                className="min-h-[40px] px-2 text-xs font-semibold text-[#00E676] hover:text-emerald-300 flex items-center gap-0.5 whitespace-nowrap"
+                className="min-h-[40px] px-2 text-xs font-semibold text-slate-200 hover:text-white flex items-center gap-0.5 whitespace-nowrap"
               >
                 <span>Leaderboard</span>
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4 text-slate-200" />
               </button>
             </div>
 
@@ -274,19 +266,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                           referrerPolicy="no-referrer"
                           className="w-11 h-11 rounded-full object-cover ring-1 ring-white/15"
                         />
-                        <span
-                          aria-hidden="true"
-                          className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full ring-2 ring-[#08090C]"
-                          style={{ backgroundColor: official.partyColor }}
-                        />
                       </div>
 
                       <div className="min-w-0">
                         <div className="flex items-center gap-1">
-                          <span className="text-sm font-semibold text-white truncate group-hover:text-[#00E676] transition-colors">
+                          <span className="text-sm font-semibold text-white truncate group-hover:text-slate-200 transition-colors">
                             {official.name}
                           </span>
-                          <ShieldCheck className="w-3.5 h-3.5 text-[#00E676] shrink-0" />
+                          <ShieldCheck className="w-3.5 h-3.5 text-slate-200 shrink-0" />
                         </div>
                         <p className="text-xs text-slate-400 truncate">
                           {official.party} · {official.state}
@@ -301,13 +288,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
                         </div>
                         <div
                           className={`text-[11px] font-semibold font-mono tabular-nums flex items-center justify-end gap-0.5 ${
-                            isPositive ? 'text-[#00E676]' : 'text-red-400'
+                            isPositive ? 'text-slate-200' : 'text-slate-400'
                           }`}
                         >
                           {isPositive ? (
-                            <ArrowUpRight className="w-3 h-3" />
+                            <ArrowUpRight className="w-3 h-3 text-slate-200" />
                           ) : (
-                            <ArrowDownRight className="w-3 h-3" />
+                            <ArrowDownRight className="w-3 h-3 text-slate-200" />
                           )}
                           <span>
                             {isPositive ? `+${official.change24h}%` : `${official.change24h}%`}
@@ -324,10 +311,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                           }}
                           className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors active:scale-95 ${
                             official.userVote === 'up'
-                              ? 'bg-[#00E676] text-black'
-                              : 'bg-white/[0.05] text-slate-400 hover:text-[#00E676] hover:bg-white/[0.1]'
+                              ? 'bg-white text-black'
+                              : 'bg-white/[0.05] text-slate-200 hover:bg-white/[0.12]'
                           }`}
                           aria-label={`Uprate ${official.name}`}
+                          aria-pressed={official.userVote === 'up'}
                         >
                           <ArrowBigUp className="w-4 h-4 fill-current" />
                         </button>
@@ -339,10 +327,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                           }}
                           className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors active:scale-95 ${
                             official.userVote === 'down'
-                              ? 'bg-red-500 text-white'
-                              : 'bg-white/[0.05] text-slate-400 hover:text-red-400 hover:bg-white/[0.1]'
+                              ? 'bg-white/[0.22] border border-white/40 text-white'
+                              : 'bg-white/[0.05] text-slate-200 hover:bg-white/[0.12]'
                           }`}
                           aria-label={`Downrate ${official.name}`}
+                          aria-pressed={official.userVote === 'down'}
                         >
                           <ArrowBigDown className="w-4 h-4 fill-current" />
                         </button>
@@ -386,7 +375,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     </div>
                     <div
                       className={`text-xs font-semibold font-mono tabular-nums ${
-                        issue.changePercent >= 0 ? 'text-[#00E676]' : 'text-amber-400'
+                        issue.changePercent >= 0 ? 'text-slate-200' : 'text-slate-400'
                       }`}
                     >
                       {issue.changePercent >= 0 ? `+${issue.changePercent}%` : `${issue.changePercent}%`}
